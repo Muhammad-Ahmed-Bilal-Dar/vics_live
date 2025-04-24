@@ -11,14 +11,8 @@ import {
   Breadcrumbs,
   Link,
   createTheme,
-  PaletteMode,
-  StyledEngineProvider,
-  Direction
+  PaletteMode
 } from '@mui/material'
-import { prefixer } from 'stylis';
-import rtlPlugin from 'stylis-plugin-rtl';
-import { CacheProvider } from '@emotion/react';
-import createCache from '@emotion/cache';
 import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import SearchIcon from '@mui/icons-material/Search'
@@ -32,17 +26,7 @@ import StationManagement from './components/Management/StationManagement'
 import AreaManagement from './components/Management/AreaManagement'
 import Settings from './components/Settings'
 import { getDesignTokens } from './theme'
-import { LanguageProvider, useLanguage, getTextDirection } from './utils/i18n/LanguageContext'
-import { SupportedLanguage } from './utils/i18n/translations'
 import './App.css'
-
-// Create rtl and ltr caches for emotion
-const createDirectionCache = (direction: Direction) => {
-  return createCache({
-    key: direction === 'rtl' ? 'muirtl' : 'muiltr',
-    stylisPlugins: direction === 'rtl' ? [prefixer, rtlPlugin] : [prefixer],
-  });
-};
 
 // Calculate the width for the main content area based on drawer state
 const getContentWidth = (open: boolean, drawerWidth: number) => {
@@ -51,10 +35,7 @@ const getContentWidth = (open: boolean, drawerWidth: number) => {
       sm: `calc(100% - ${open ? drawerWidth : 64}px)`,
       xs: '100%',
     },
-    ml: {
-      sm: open ? `${drawerWidth}px` : '64px',
-      xs: 0,
-    },
+   
     transition: (theme: any) => theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -62,48 +43,14 @@ const getContentWidth = (open: boolean, drawerWidth: number) => {
   };
 };
 
-// Wrapper for AppContent to have access to the language context
-const AppWithLanguage: React.FC = () => {
-  const { language, setLanguage } = useLanguage();
-  
-  // Determine text direction based on language
-  const direction = getTextDirection(language);
-  
-  // Create the appropriate cache
-  const cache = useMemo(() => createDirectionCache(direction), [direction]);
-  
-  return (
-    <CacheProvider value={cache}>
-      <AppContent 
-        language={language} 
-        setLanguage={setLanguage}
-        direction={direction}
-      />
-    </CacheProvider>
-  );
-};
-
-// App content with props from the language context
-interface AppContentProps {
-  language: SupportedLanguage;
-  setLanguage: (lang: SupportedLanguage) => void;
-  direction: Direction;
-}
-
-const AppContent: React.FC<AppContentProps> = ({ language, setLanguage, direction }) => {
+function App() {
   const drawerWidth = 240;
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentModule, setCurrentModule] = useState('Dashboard');
   const [mode, setMode] = useState<PaletteMode>('light');
 
-  // Create theme based on current mode and direction
-  const theme = useMemo(() => {
-    const tokens = getDesignTokens(mode);
-    return createTheme({
-      ...tokens,
-      direction: direction,
-    });
-  }, [mode, direction]);
+  // Create theme based on current mode
+  const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
   
   // Extract parent and sub module from path like "Management/User"
   const modulePathParts = currentModule.split('/');
@@ -122,10 +69,6 @@ const AppContent: React.FC<AppContentProps> = ({ language, setLanguage, directio
   const handleThemeChange = (newMode: PaletteMode) => {
     setMode(newMode);
   };
-  
-  const handleLanguageChange = (newLanguage: SupportedLanguage) => {
-    setLanguage(newLanguage);
-  };
 
   // Function to render the appropriate module content
   const renderModuleContent = () => {
@@ -142,11 +85,7 @@ const AppContent: React.FC<AppContentProps> = ({ language, setLanguage, directio
     } else if (currentModule === 'Management/Area') {
       return <AreaManagement visible={true} />;
     } else if (currentModule === 'Settings') {
-      return <Settings 
-        visible={true} 
-        onThemeChange={handleThemeChange}
-        onLanguageChange={handleLanguageChange}
-      />;
+      return <Settings visible={true} onThemeChange={handleThemeChange} />;
     } else if (isManagementSubmodule) {
       return (
         <Box sx={{ p: 3, animation: 'fadeIn 0.6s ease-in-out' }}>
@@ -173,94 +112,83 @@ const AppContent: React.FC<AppContentProps> = ({ language, setLanguage, directio
   };
 
   return (
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={theme}>
-        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-          <CssBaseline />
-          
-          {/* Top Navigation Bar */}
-          <AppBar position="fixed" sx={getContentWidth(sidebarOpen, drawerWidth)}>
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="toggle drawer"
-                edge="start"
-                onClick={handleDrawerToggle}
-                sx={{ mr: 2, display: { sm: 'none' } }}
+    <ThemeProvider theme={theme}>
+      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+        <CssBaseline />
+        
+        {/* Top Navigation Bar */}
+        <AppBar position="fixed" sx={getContentWidth(sidebarOpen, drawerWidth)}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="toggle drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: 'none' } }}
+            >
+              <MenuIcon />
+            </IconButton>
+            
+            {/* Breadcrumbs for submodules */}
+            {isManagementSubmodule ? (
+              <Breadcrumbs 
+                separator={<NavigateNextIcon fontSize="small" />} 
+                aria-label="breadcrumb"
+                sx={{ flexGrow: 1, color: 'inherit' }}
               >
-                <MenuIcon />
-              </IconButton>
-              
-              {/* Breadcrumbs for submodules */}
-              {isManagementSubmodule ? (
-                <Breadcrumbs 
-                  separator={<NavigateNextIcon fontSize="small" />} 
-                  aria-label="breadcrumb"
-                  sx={{ flexGrow: 1, color: 'inherit' }}
+                <Link 
+                  color="inherit" 
+                  href="#" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleModuleSelect(parentModule);
+                  }}
+                  sx={{ fontWeight: 'medium' }}
                 >
-                  <Link 
-                    color="inherit" 
-                    href="#" 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleModuleSelect(parentModule);
-                    }}
-                    sx={{ fontWeight: 'medium' }}
-                  >
-                    {parentModule}
-                  </Link>
-                  <Typography color="inherit" sx={{ fontWeight: 'bold' }}>{subModule}</Typography>
-                </Breadcrumbs>
-              ) : (
-                <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                  {currentModule}
-                </Typography>
-              )}
-              
-              <IconButton color="inherit" sx={{ mx: 1 }}>
-                <SearchIcon />
-              </IconButton>
-              <IconButton color="inherit" sx={{ mx: 1 }}>
-                <NotificationsIcon />
-              </IconButton>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.secondary.main }}>
-                U
-              </Avatar>
-            </Toolbar>
-          </AppBar>
-          
-          {/* Sidebar */}
-          <Sidebar 
-            open={sidebarOpen} 
-            onToggle={handleDrawerToggle} 
-            onModuleSelect={handleModuleSelect} 
-          />
-          
-          {/* Main Content */}
-          <Box
-            component="main"
-            sx={{
-              ...getContentWidth(sidebarOpen, drawerWidth),
-              pt: { xs: 8, sm: 9 },
-              flexGrow: 1,
-              bgcolor: 'background.default',
-            }}
-          >
-            {renderModuleContent()}
-          </Box>
+                  {parentModule}
+                </Link>
+                <Typography color="inherit" sx={{ fontWeight: 'bold' }}>{subModule}</Typography>
+              </Breadcrumbs>
+            ) : (
+              <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+                {currentModule}
+              </Typography>
+            )}
+            
+            <IconButton color="inherit" sx={{ mx: 1 }}>
+              <SearchIcon />
+            </IconButton>
+            <IconButton color="inherit" sx={{ mx: 1 }}>
+              <NotificationsIcon />
+            </IconButton>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.secondary.main }}>
+              U
+            </Avatar>
+          </Toolbar>
+        </AppBar>
+        
+        {/* Sidebar */}
+        <Sidebar 
+          open={sidebarOpen} 
+          onToggle={handleDrawerToggle} 
+          onModuleSelect={handleModuleSelect} 
+        />
+        
+        {/* Main Content */}
+        <Box
+          component="main"
+          sx={{
+            ...getContentWidth(sidebarOpen, drawerWidth),
+            pt: { xs: 8, sm: 9 },
+            flexGrow: 1,
+            bgcolor: 'background.default',
+          }}
+        >
+          {renderModuleContent()}
         </Box>
-      </ThemeProvider>
-    </StyledEngineProvider>
-  );
-};
-
-// Main App component with LanguageProvider wrapper
-function App() {
-  return (
-    <LanguageProvider>
-      <AppWithLanguage />
-    </LanguageProvider>
-  );
+      </Box>
+    </ThemeProvider>
+  )
 }
 
-export default App;
+export default App

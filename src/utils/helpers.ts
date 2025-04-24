@@ -34,5 +34,11 @@ export const formatDate = (dateStr: string): string => {
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
   ];
   
-  return `${months[parseInt(month) - 1]} ${parseInt(day)}, ${year}`;
+  // Check if month is valid before accessing months array
+  const monthIndex = parseInt(month) - 1;
+  if (isNaN(monthIndex) || monthIndex < 0 || monthIndex >= months.length) {
+    return dateStr; // Return original string if date format is invalid
+  }
+  
+  return `${months[monthIndex]} ${parseInt(day)}, ${year}`;
 }; 

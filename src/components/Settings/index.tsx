@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Card,
@@ -13,7 +13,7 @@ import {
   MenuItem,
   Switch,
   Divider,
-  Grid as MuiGrid,
+  Grid,
   Slider,
   Button,
   useTheme,
@@ -29,36 +29,19 @@ import FormatSizeIcon from '@mui/icons-material/FormatSize';
 import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import { useLanguage } from '../../utils/i18n/LanguageContext';
-import { SupportedLanguage } from '../../utils/i18n/translations';
-
-// Use Grid explicitly to ensure correct props
-const Grid = MuiGrid;
 
 interface SettingsProps {
   visible: boolean;
   onThemeChange?: (mode: 'light' | 'dark') => void;
   onFontSizeChange?: (size: number) => void;
-  onLanguageChange?: (language: SupportedLanguage) => void;
 }
 
-const Settings: React.FC<SettingsProps> = ({ 
-  visible, 
-  onThemeChange, 
-  onFontSizeChange,
-  onLanguageChange 
-}) => {
+const Settings: React.FC<SettingsProps> = ({ visible, onThemeChange, onFontSizeChange }) => {
   const theme = useTheme();
-  const { language, t } = useLanguage();
   const [mode, setMode] = useState<'light' | 'dark'>(theme.palette.mode || 'light');
-  const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>(language);
+  const [language, setLanguage] = useState<string>('en');
   const [fontSize, setFontSize] = useState<number>(14);
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  
-  // Update selected language when context changes
-  useEffect(() => {
-    setSelectedLanguage(language);
-  }, [language]);
   
   const handleModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newMode = event.target.value as 'light' | 'dark';
@@ -69,11 +52,7 @@ const Settings: React.FC<SettingsProps> = ({
   };
   
   const handleLanguageChange = (event: SelectChangeEvent) => {
-    const newLanguage = event.target.value as SupportedLanguage;
-    setSelectedLanguage(newLanguage);
-    if (onLanguageChange) {
-      onLanguageChange(newLanguage);
-    }
+    setLanguage(event.target.value);
   };
   
   const handleFontSizeChange = (event: Event, newValue: number | number[]) => {
@@ -91,13 +70,10 @@ const Settings: React.FC<SettingsProps> = ({
   
   const handleReset = () => {
     setMode('light');
-    setSelectedLanguage('en');
+    setLanguage('en');
     setFontSize(14);
     if (onThemeChange) {
       onThemeChange('light');
-    }
-    if (onLanguageChange) {
-      onLanguageChange('en');
     }
     if (onFontSizeChange) {
       onFontSizeChange(14);
@@ -110,10 +86,10 @@ const Settings: React.FC<SettingsProps> = ({
   };
   
   const getFontSizeText = (value: number) => {
-    if (value <= 12) return t('small');
-    if (value <= 14) return t('default');
-    if (value <= 16) return t('large');
-    return t('extraLarge');
+    if (value <= 12) return 'Small';
+    if (value <= 14) return 'Default';
+    if (value <= 16) return 'Large';
+    return 'Extra Large';
   };
   
   if (!visible) {
@@ -126,7 +102,7 @@ const Settings: React.FC<SettingsProps> = ({
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
         <SettingsIcon sx={{ color: theme.palette.primary.main }} />
         <Typography variant="h5" component="h1">
-          {t('settings')}
+          Settings
         </Typography>
       </Box>
       
@@ -136,12 +112,12 @@ const Settings: React.FC<SettingsProps> = ({
           <Card elevation={1}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <DarkModeIcon /> {t('theme')}
+                <DarkModeIcon /> Theme
               </Typography>
               <Divider sx={{ my: 2 }} />
               
               <FormControl component="fieldset" sx={{ mb: 3, width: '100%' }}>
-                <FormLabel component="legend">{t('displayMode')}</FormLabel>
+                <FormLabel component="legend">Display Mode</FormLabel>
                 <RadioGroup
                   row
                   value={mode}
@@ -153,7 +129,7 @@ const Settings: React.FC<SettingsProps> = ({
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <LightModeIcon fontSize="small" />
-                        <span>{t('light')}</span>
+                        <span>Light</span>
                       </Box>
                     } 
                   />
@@ -163,7 +139,7 @@ const Settings: React.FC<SettingsProps> = ({
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <DarkModeIcon fontSize="small" />
-                        <span>{t('dark')}</span>
+                        <span>Dark</span>
                       </Box>
                     } 
                   />
@@ -174,7 +150,7 @@ const Settings: React.FC<SettingsProps> = ({
                 <FormLabel component="legend" sx={{ mb: 1 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <FormatSizeIcon fontSize="small" />
-                    <span>{t('textSize')}</span>
+                    <span>Text Size</span>
                   </Box>
                 </FormLabel>
                 <Box sx={{ px: 1 }}>
@@ -189,15 +165,15 @@ const Settings: React.FC<SettingsProps> = ({
                     valueLabelFormat={getFontSizeText}
                   />
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                    <Typography variant="caption">{t('small')}</Typography>
-                    <Typography variant="caption">{t('extraLarge')}</Typography>
+                    <Typography variant="caption">Small</Typography>
+                    <Typography variant="caption">Extra Large</Typography>
                   </Box>
                 </Box>
               </FormControl>
               
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                 <Typography variant="body2">
-                  {t('currentTextSize')}: {getFontSizeText(fontSize)} ({fontSize}px)
+                  Current Text Size: {getFontSizeText(fontSize)} ({fontSize}px)
                 </Typography>
               </Box>
             </CardContent>
@@ -209,48 +185,48 @@ const Settings: React.FC<SettingsProps> = ({
           <Card elevation={1}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <LanguageIcon /> {t('languageAndRegion')}
+                <LanguageIcon /> Language & Region
               </Typography>
               <Divider sx={{ my: 2 }} />
               
               <FormControl fullWidth sx={{ mb: 3 }}>
-                <FormLabel component="legend" sx={{ mb: 1 }}>{t('language')}</FormLabel>
+                <FormLabel component="legend" sx={{ mb: 1 }}>Language</FormLabel>
                 <Select
-                  value={selectedLanguage}
+                  value={language}
                   onChange={handleLanguageChange}
                   size="small"
                 >
                   <MenuItem value="en">English</MenuItem>
-                  <MenuItem value="ur">اردو</MenuItem>
-                  <MenuItem value="ar">العربية</MenuItem>
-                  <MenuItem value="zh">中文</MenuItem>
+                  <MenuItem value="ur">Urdu</MenuItem>
+                  <MenuItem value="ar">Arabic</MenuItem>
+                  <MenuItem value="zh">Chinese</MenuItem>
                 </Select>
               </FormControl>
               
               <FormControl component="fieldset" sx={{ mb: 3, width: '100%' }}>
-                <FormLabel component="legend">{t('notificationSettings')}</FormLabel>
+                <FormLabel component="legend">Notification Settings</FormLabel>
                 <Box sx={{ mt: 1 }}>
                   <FormControlLabel 
                     control={<Switch defaultChecked />} 
-                    label={t('emailNotifications')} 
+                    label="Email Notifications" 
                   />
                 </Box>
                 <Box>
                   <FormControlLabel 
                     control={<Switch defaultChecked />} 
-                    label={t('pushNotifications')} 
+                    label="Push Notifications" 
                   />
                 </Box>
               </FormControl>
               
               <FormControl component="fieldset" sx={{ width: '100%' }}>
-                <FormLabel component="legend">{t('dateTimeFormat')}</FormLabel>
+                <FormLabel component="legend">Date & Time Format</FormLabel>
                 <RadioGroup
                   defaultValue="12"
                   sx={{ mt: 1 }}
                 >
-                  <FormControlLabel value="12" control={<Radio />} label={t('hour12')} />
-                  <FormControlLabel value="24" control={<Radio />} label={t('hour24')} />
+                  <FormControlLabel value="12" control={<Radio />} label="12-hour (1:30 PM)" />
+                  <FormControlLabel value="24" control={<Radio />} label="24-hour (13:30)" />
                 </RadioGroup>
               </FormControl>
             </CardContent>
@@ -266,14 +242,14 @@ const Settings: React.FC<SettingsProps> = ({
           startIcon={<RestartAltIcon />}
           onClick={handleReset}
         >
-          {t('resetToDefault')}
+          Reset to Default
         </Button>
         <Button 
           variant="contained" 
           startIcon={<SaveIcon />}
           onClick={handleSave}
         >
-          {t('saveSettings')}
+          Save Settings
         </Button>
       </Box>
       
@@ -282,7 +258,7 @@ const Settings: React.FC<SettingsProps> = ({
         open={snackbarOpen}
         autoHideDuration={4000}
         onClose={handleCloseSnackbar}
-        message={t('settingsUpdated')}
+        message="Settings updated successfully"
         action={
           <IconButton
             size="small"

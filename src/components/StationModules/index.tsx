@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   Box, 
   Card, 
@@ -7,144 +6,86 @@ import {
   LinearProgress, 
   IconButton, 
   styled,
-  Grid as MuiGrid,
-  Divider
+  Grid as MuiGrid
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
-import CloseIcon from '@mui/icons-material/Close';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import CloseIcon from '@mui/icons-material/Close';
 import EvStationIcon from '@mui/icons-material/EvStation';
-import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';
-import BoltOutlinedIcon from '@mui/icons-material/BoltOutlined';
-import LocalGasStationOutlinedIcon from '@mui/icons-material/LocalGasStationOutlined';
-import StarIcon from '@mui/icons-material/Star';
-import StarHalfIcon from '@mui/icons-material/StarHalf';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import ElectricCarIcon from '@mui/icons-material/ElectricCar';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import AirportShuttleIcon from '@mui/icons-material/AirportShuttle';
-import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
-import { useLanguage } from '../../utils/i18n/LanguageContext';
 
 // Create a Grid component that ensures 'item' prop works
-const Grid = styled(MuiGrid)``;
+const Grid = MuiGrid;
 
-// Styled Components
-const Container = styled(Box)`
-  padding: 20px;
-`;
+// Styled icon wrapper
+const StationIcon = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#f0f4f8',
+  borderRadius: '4px',
+  padding: theme.spacing(1),
+  marginRight: theme.spacing(2),
+  width: '48px',
+  height: '48px',
+}));
 
-const StyledLinearProgress = styled(LinearProgress)`
-  height: 10px;
-  border-radius: 5px;
-  background-color: #f0f0f0;
-  margin: 8px 0;
-`;
-
-// New styled component for the IconSquare
-const IconSquare = styled(Box)<{ color: string }>`
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background-color: ${props => props.color}10;
-  color: ${props => props.color};
-`;
-
-// Station Icon component with background
-const StationIcon = styled(Box)<{ bgcolor: string }>`
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background-color: ${props => props.bgcolor};
-  color: white;
-`;
+// Styled progress bar
+const StyledLinearProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 8,
+  borderRadius: 4,
+  marginTop: theme.spacing(1),
+  marginBottom: theme.spacing(0.5),
+  backgroundColor: '#E0E0E0',
+}));
 
 interface StationModulesProps {
   visible: boolean;
-  onModuleSelect?: (module: string) => void;
+  onModuleSelect: (module: string) => void;
 }
 
-const StationModules: React.FC<StationModulesProps> = ({ visible, onModuleSelect }) => {
-  const { t } = useLanguage();
-  
-  const statisticsData = [
-    {
-      icon: <BoltOutlinedIcon />,
-      title: t('chargers'),
-      value: 34,
-      color: '#7367F0',
-      progress: 100,
-    },
-    {
-      icon: <DeviceThermostatOutlinedIcon />,
-      title: t('active'),
-      value: 15,
-      color: '#28C76F',
-      progress: 44,
-    },
-    {
-      icon: <LocalGasStationOutlinedIcon />,
-      title: t('operational'),
-      value: 12,
-      color: '#EA5455',
-      progress: 35,
-    },
-    {
-      icon: <BoltOutlinedIcon />,
-      title: t('maintenance'),
-      value: 7,
-      color: '#FF9F43',
-      progress: 20,
-    },
+const StationModules = ({ visible, onModuleSelect }: StationModulesProps) => {
+  // Statistics cards data
+  const statsCards = [
+    { title: 'Total Chargers', value: '256', percentage: 100, color: '#1976d2', icon: <BatteryChargingFullIcon sx={{ color: '#4caf50' }} /> },
+    { title: 'Available Chargers', value: '425', percentage: 75, color: '#1976d2', icon: <InfoIcon sx={{ color: '#888' }} /> },
+    { title: 'In Use Chargers', value: '100', percentage: 45, color: '#ff9800', icon: <InfoIcon sx={{ color: '#888' }} /> },
+    { title: 'Unavailable Charger', value: '18', percentage: 8, color: '#f44336', icon: <InfoIcon sx={{ color: '#888' }} /> },
   ];
 
-  const stationData = [
-    {
-      icon: <ElectricCarIcon fontSize="large" />,
-      iconBg: '#3366FF',
-      distance: 3.7,
-      name: 'Tesla Station',
-      rating: 5,
-      type: "AC Type 2",
-      price: '$13.1',
-      availableSlot: 8,
+  // Station cards data
+  const stationCards = [
+    { 
+      distance: '2.5', 
+      name: 'Tesla Station', 
+      type: 'DC', 
+      price: '$2.2kW', 
+      slots: '2',
+      icon: <EvStationIcon sx={{ color: '#1976d2' }} />
     },
-    {
-      icon: <DirectionsCarIcon fontSize="large" />,
-      iconBg: '#E91E63',
-      distance: 5.9,
-      name: 'Benz Station',
-      rating: 4.5,
-      type: "AC Type 2",
-      price: '$9.5',
-      availableSlot: 3,
+    { 
+      distance: '3.8', 
+      name: 'Benz Station', 
+      type: 'DC', 
+      price: '$1.5kW', 
+      slots: '5',
+      icon: <EvStationIcon sx={{ color: '#1976d2' }} />
     },
-    {
-      icon: <AirportShuttleIcon fontSize="large" />,
-      iconBg: '#4CAF50',
-      distance: 9.3,
-      name: 'Nissan Station',
-      rating: 4,
-      type: "AC Type 2",
-      price: '$7.3',
-      availableSlot: 6,
+    { 
+      distance: '2.6', 
+      name: 'Nissan Station', 
+      type: 'DC', 
+      price: '$1.2kW', 
+      slots: '6',
+      icon: <EvStationIcon sx={{ color: '#1976d2' }} />
     },
-    {
-      icon: <TwoWheelerIcon fontSize="large" />,
-      iconBg: '#FF9800',
-      distance: 12.5,
-      name: 'SUV Station',
-      rating: 3.5,
-      type: "DC CCS",
-      price: '$6.8',
-      availableSlot: 2,
+    { 
+      distance: '1.6', 
+      name: 'SUV Station', 
+      type: 'DC', 
+      price: '$0.9kW', 
+      slots: '8',
+      icon: <EvStationIcon sx={{ color: '#1976d2' }} />
     },
   ];
 
@@ -172,8 +113,8 @@ const StationModules: React.FC<StationModulesProps> = ({ visible, onModuleSelect
     >
       {/* Statistics Cards */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 4 }}>
-        {statisticsData.map((item, index) => (
-          <Box key={index} sx={{ flexGrow: 1, flexBasis: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}>
+        {statsCards.map((card) => (
+          <Box key={card.title} sx={{ flexGrow: 1, flexBasis: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}>
             <Card sx={{ 
               backgroundColor: '#fff', 
               borderRadius: '8px', 
@@ -182,22 +123,33 @@ const StationModules: React.FC<StationModulesProps> = ({ visible, onModuleSelect
             }}>
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <IconSquare color={item.color}>{item.icon}</IconSquare>
-                  <Box sx={{ ml: 1.5 }}>
-                    <Typography variant="body2" sx={{ opacity: 0.7 }}>{item.title}</Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{item.value}</Typography>
-                  </Box>
+                  <Typography variant="h6" component="h2" sx={{ flexGrow: 1 }}>
+                    {card.title}
+                  </Typography>
+                  {card.icon}
                 </Box>
+                
+                <Typography variant="h3" component="div" sx={{ 
+                  fontWeight: 'bold', 
+                  mb: 0.5, 
+                  fontSize: '2.5rem'
+                }}>
+                  {card.value}
+                </Typography>
                 
                 <StyledLinearProgress 
                   variant="determinate" 
-                  value={item.progress} 
+                  value={card.percentage} 
                   sx={{ 
                     '& .MuiLinearProgress-bar': {
-                      backgroundColor: item.color,
+                      backgroundColor: card.color,
                     }
                   }}
                 />
+                
+                <Typography variant="body2" color="text.secondary">
+                  {card.percentage}%
+                </Typography>
               </CardContent>
             </Card>
           </Box>
@@ -206,8 +158,8 @@ const StationModules: React.FC<StationModulesProps> = ({ visible, onModuleSelect
 
       {/* Station Cards */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-        {stationData.map((station, index) => (
-          <Box key={index} sx={{ flexGrow: 1, flexBasis: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}>
+        {stationCards.map((station) => (
+          <Box key={station.name} sx={{ flexGrow: 1, flexBasis: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}>
             <Card sx={{ 
               backgroundColor: '#fff',
               borderRadius: '8px',
@@ -226,10 +178,19 @@ const StationModules: React.FC<StationModulesProps> = ({ visible, onModuleSelect
               
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                  <StationIcon bgcolor={station.iconBg}>
+                  <Box sx={{ 
+                    bgcolor: '#f0f7ff', 
+                    width: 60, 
+                    height: 60, 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '8px',
+                    mr: 2
+                  }}>
                     {station.icon}
-                  </StationIcon>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', ml: 2 }}>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography variant="h3" component="div" sx={{ 
                       fontWeight: 'bold', 
                       fontSize: '2rem',
@@ -269,7 +230,7 @@ const StationModules: React.FC<StationModulesProps> = ({ visible, onModuleSelect
                       Slot
                     </Typography>
                     <Typography variant="body1">
-                      {station.availableSlot}
+                      {station.slots}
                     </Typography>
                   </Box>
                 </Box>
