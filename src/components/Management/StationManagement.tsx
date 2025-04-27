@@ -16,7 +16,9 @@ import {
   InputAdornment,
   Button,
   Stack,
-  useTheme
+  useTheme,
+  Tabs,
+  Tab
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -24,7 +26,14 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddIcon from '@mui/icons-material/Add';
 import EvStationIcon from '@mui/icons-material/EvStation';
 import BoltIcon from '@mui/icons-material/Bolt';
+import GroupIcon from '@mui/icons-material/Group';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { getAvailabilityPercentage, formatDate } from '../../utils/helpers';
+
+// Import the tab components
+import StationList from './StationList';
+import StationUserManagement from './StationUserManagement';
+import StationForm from './StationForm';
 
 // Types
 interface Station {
@@ -179,8 +188,43 @@ const stationData: Station[] = [
   }
 ];
 
+// Helper component for Tab Panel
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`station-management-tabpanel-${index}`}
+      aria-labelledby={`station-management-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `station-management-tab-${index}`,
+    'aria-controls': `station-management-tabpanel-${index}`,
+  };
+}
+
 const StationManagement: React.FC<StationManagementProps> = ({ visible }) => {
   const theme = useTheme();
+  const [currentTab, setCurrentTab] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
@@ -216,6 +260,10 @@ const StationManagement: React.FC<StationManagementProps> = ({ visible }) => {
     }
   };
   
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setCurrentTab(newValue);
+  };
+  
   if (!visible) {
     return null;
   }
@@ -230,128 +278,46 @@ const StationManagement: React.FC<StationManagementProps> = ({ visible }) => {
             Station Management
           </Typography>
         </Box>
-        
-        <Button 
-          variant="contained" 
-          startIcon={<AddIcon />}
-        >
-          Add New Station
-        </Button>
       </Box>
-      
-      {/* Search and Filter Bar */}
-      <Paper sx={{ mb: 3, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <TextField
-          placeholder="Search stations"
-          variant="outlined"
-          size="small"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ width: 300 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-        
-        <Stack direction="row" spacing={1}>
-          <Button variant="outlined" startIcon={<FilterListIcon />}>
-            Filter
-          </Button>
-        </Stack>
-      </Paper>
-      
-      {/* Stations Table */}
-      <Paper>
-        <TableContainer>
-          <Table>
-            <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Station Name</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Location</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Type</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Power Output</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Chargers</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Last Updated</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredStations
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((station) => (
-                  <TableRow key={station.id} hover>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Box sx={{ 
-                          width: 36, 
-                          height: 36, 
-                          bgcolor: '#e8f5e9', 
-                          borderRadius: '50%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>
-                          <EvStationIcon color="primary" fontSize="small" />
-                        </Box>
-                        <Typography variant="body2">{station.name}</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{station.location}</TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <BoltIcon fontSize="small" sx={{ 
-                          color: station.stationType === 'DC' ? theme.palette.charger.dc : theme.palette.charger.ac,
-                        }} />
-                        <Typography variant="body2">{station.stationType}</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{station.powerOutput}</TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {station.availableChargers} / {station.totalChargers} 
-                        <Typography variant="caption" sx={{ ml: 1, color: 'text.secondary' }}>
-                          ({getAvailabilityPercentage(station.availableChargers, station.totalChargers)}%)
-                        </Typography>
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={station.status} 
-                        size="small" 
-                        sx={{ 
-                          bgcolor: `${getStatusColor(station.status)}15`,
-                          color: getStatusColor(station.status),
-                          fontWeight: 'bold',
-                          textTransform: 'capitalize'
-                        }} 
-                      />
-                    </TableCell>
-                    <TableCell>{formatDate(station.lastUpdated)}</TableCell>
-                    <TableCell>
-                      <IconButton size="small">
-                        <MoreVertIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredStations.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
+
+      {/* Tabs Navigation */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Tabs value={currentTab} onChange={handleTabChange} aria-label="Station Management Tabs">
+          <Tab 
+            label="Station List" 
+            icon={<EvStationIcon />} 
+            iconPosition="start" 
+            {...a11yProps(0)} 
+            sx={{ textTransform: 'none' }} 
+          />
+          <Tab 
+            label="Station User Management" 
+            icon={<GroupIcon />} 
+            iconPosition="start" 
+            {...a11yProps(1)} 
+            sx={{ textTransform: 'none' }} 
+          />
+          <Tab 
+            label="Add New Station" 
+            icon={<AddCircleOutlineIcon />} 
+            iconPosition="start" 
+            {...a11yProps(2)} 
+            sx={{ textTransform: 'none' }} 
+          />
+        </Tabs>
+      </Box>
+
+      {/* Tab Panels (Content) */}
+      <TabPanel value={currentTab} index={0}>
+        <StationList />
+      </TabPanel>
+      <TabPanel value={currentTab} index={1}>
+        <StationUserManagement />
+      </TabPanel>
+      <TabPanel value={currentTab} index={2}>
+        <StationForm />
+      </TabPanel>
+
     </Box>
   );
 };

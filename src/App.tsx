@@ -11,7 +11,8 @@ import {
   Breadcrumbs,
   Link,
   createTheme,
-  PaletteMode
+  PaletteMode,
+  Button
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
@@ -27,6 +28,12 @@ import AreaManagement from './components/Management/AreaManagement'
 import Settings from './components/Settings'
 import { getDesignTokens } from './theme'
 import './App.css'
+import Login from './components/Login/Login'
+import RoleSelection from './components/RoleSelection/RoleSelection'
+import LawMisSelection from './components/LawMisSelection/LawMisSelection'
+import LawMisUserLogin from './components/Login/LawMisUserLogin'
+import LawMisAdminLogin from './components/Login/LawMisAdminLogin'
+import LawMisUserRegister from './components/Register/LawMisUserRegister'
 
 // Calculate the width for the main content area based on drawer state
 const getContentWidth = (open: boolean, drawerWidth: number) => {
@@ -43,11 +50,23 @@ const getContentWidth = (open: boolean, drawerWidth: number) => {
   };
 };
 
+// Define Role and Dashboard Types
+type SelectedRole = 'VICS_ADMIN' | 'LAW_MIS' | null;
+type LawMisDashboardType = 'USER' | 'ADMIN' | null;
+type LawMisUserView = 'LOGIN' | 'REGISTER';
+
 function App() {
   const drawerWidth = 240;
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentModule, setCurrentModule] = useState('Dashboard');
   const [mode, setMode] = useState<PaletteMode>('light');
+  
+  // --- Authentication and Navigation State --- 
+  const [selectedRole, setSelectedRole] = useState<SelectedRole>(null);
+  const [lawMisDashboardType, setLawMisDashboardType] = useState<LawMisDashboardType>(null);
+  const [lawMisUserView, setLawMisUserView] = useState<LawMisUserView>('LOGIN');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [lawMisLoggedInAs, setLawMisLoggedInAs] = useState<LawMisDashboardType>(null);
 
   // Create theme based on current mode
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
@@ -58,20 +77,75 @@ function App() {
   const subModule = modulePathParts.length > 1 ? modulePathParts[1] : '';
   const isManagementSubmodule = parentModule === 'Management';
 
-  const handleDrawerToggle = () => {
-    setSidebarOpen(!sidebarOpen);
+  // --- VICS App Handlers ---
+  const handleDrawerToggle = () => setSidebarOpen(!sidebarOpen);
+  const handleModuleSelect = (module: string) => setCurrentModule(module);
+  const handleThemeChange = (newMode: PaletteMode) => setMode(newMode);
+
+  // --- Navigation and Auth Handlers ---
+  const handleRoleSelect = (role: SelectedRole) => {
+    setSelectedRole(role);
+    setLawMisDashboardType(null);
+    setLawMisUserView('LOGIN');
+    setIsLoggedIn(false);
+    setLawMisLoggedInAs(null);
   };
 
-  const handleModuleSelect = (module: string) => {
-    setCurrentModule(module);
+  const handleLawMisDashboardSelect = (dashboardType: LawMisDashboardType) => {
+    setLawMisDashboardType(dashboardType);
+    setLawMisUserView('LOGIN');
+    setIsLoggedIn(false);
+    setLawMisLoggedInAs(null);
   };
   
-  const handleThemeChange = (newMode: PaletteMode) => {
-    setMode(newMode);
+  const handleLoginSuccess = () => {
+    if (selectedRole === 'VICS_ADMIN') {
+      setIsLoggedIn(true);
+    } else if (selectedRole === 'LAW_MIS') {
+       if (lawMisDashboardType === 'USER') {
+           console.log('LAW-MIS User Logged In');
+           setLawMisLoggedInAs('USER');
+       } else if (lawMisDashboardType === 'ADMIN') {
+           console.log('LAW-MIS Admin Logged In');
+           setLawMisLoggedInAs('ADMIN');
+       }
+    }
   };
 
-  // Function to render the appropriate module content
-  const renderModuleContent = () => {
+  // Go back from VICS Login to Role Selection
+  const handleGoBackToRoleSelection = () => {
+      setSelectedRole(null);
+      setIsLoggedIn(false);
+      setLawMisDashboardType(null);
+      setLawMisLoggedInAs(null);
+      setLawMisUserView('LOGIN');
+  };
+
+  // Go back from LAW-MIS Login/Register pages to LAW-MIS Selection
+  const handleGoBackToLawMisSelection = () => {
+      setLawMisDashboardType(null);
+      setIsLoggedIn(false);
+      setLawMisLoggedInAs(null);
+      setLawMisUserView('LOGIN');
+  };
+  
+  // Navigate to Register page
+  const handleRegisterClick = () => {
+      setLawMisUserView('REGISTER');
+  };
+  
+  // Handle successful registration (navigate back to login)
+  const handleRegisterSuccess = () => {
+       setLawMisUserView('LOGIN');
+  };
+  
+  // Go back from Register page to Login page
+  const handleGoBackToLawMisLogin = () => {
+      setLawMisUserView('LOGIN');
+  };
+
+  // --- VICS App Content Rendering --- (Keep this separate for clarity)
+  const renderVicsAppContent = () => {
     if (currentModule === 'Dashboard') {
       return <Dashboard visible={true} />;
     } else if (currentModule === 'Station') {
@@ -87,7 +161,7 @@ function App() {
     } else if (currentModule === 'Settings') {
       return <Settings visible={true} onThemeChange={handleThemeChange} />;
     } else if (isManagementSubmodule) {
-      return (
+       return (
         <Box sx={{ p: 3, animation: 'fadeIn 0.6s ease-in-out' }}>
           <Typography variant="h5" sx={{ mb: 3 }}>
             {subModule} Management
@@ -98,7 +172,7 @@ function App() {
         </Box>
       );
     } else {
-      return (
+       return (
         <Box sx={{ p: 3 }}>
           <Typography variant="h5">
             {currentModule} Module
@@ -111,84 +185,110 @@ function App() {
     }
   };
 
+  // --- Main Conditional Rendering Logic --- 
+  const renderContent = () => {
+    // 1. No Role Selected? Show RoleSelection.
+    if (!selectedRole) {
+      return <RoleSelection onRoleSelect={handleRoleSelect} />;
+    }
+
+    // 2. VICS ADMIN Selected?
+    if (selectedRole === 'VICS_ADMIN') {
+      if (!isLoggedIn) {
+        // Show VICS Login
+        return <Login onLoginSuccess={handleLoginSuccess} onGoBack={handleGoBackToRoleSelection} />;
+      } else {
+        // Show VICS Main App Layout
+        return (
+          <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+            <AppBar position="fixed" sx={getContentWidth(sidebarOpen, drawerWidth)}>
+              <Toolbar>
+                <IconButton
+                  color="inherit"
+                  aria-label="toggle drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 2, display: { sm: 'none' } }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                {isManagementSubmodule ? (
+                  <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb" sx={{ flexGrow: 1, color: 'inherit' }}>
+                    <Link color="inherit" href="#" onClick={(e) => { e.preventDefault(); handleModuleSelect(parentModule); }} sx={{ fontWeight: 'medium' }}>
+                      {parentModule}
+                    </Link>
+                    <Typography color="inherit" sx={{ fontWeight: 'bold' }}>{subModule}</Typography>
+                  </Breadcrumbs>
+                ) : (
+                  <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}> {currentModule} </Typography>
+                )}
+                <IconButton color="inherit" sx={{ mx: 1 }}> <SearchIcon /> </IconButton>
+                <IconButton color="inherit" sx={{ mx: 1 }}> <NotificationsIcon /> </IconButton>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.secondary.main }}> U </Avatar>
+              </Toolbar>
+            </AppBar>
+            <Sidebar open={sidebarOpen} onToggle={handleDrawerToggle} onModuleSelect={handleModuleSelect} />
+            <Box component="main" sx={{ ...getContentWidth(sidebarOpen, drawerWidth), pt: { xs: 8, sm: 9 }, flexGrow: 1, bgcolor: 'background.default' }}>
+              {renderVicsAppContent()} 
+            </Box>
+          </Box>
+        );
+      }
+    }
+
+    // 3. LAW-MIS Selected?
+    if (selectedRole === 'LAW_MIS') {
+       // Check if a specific LAW-MIS dashboard type is chosen
+       if (!lawMisDashboardType) {
+            return <LawMisSelection onSelectDashboard={handleLawMisDashboardSelect} onGoBack={handleGoBackToRoleSelection} />;
+       }
+       
+       // Check if logged into LAW-MIS portal
+       if (!lawMisLoggedInAs) { 
+           if (lawMisDashboardType === 'USER') {
+               // Check if user is on Login or Register view
+               if (lawMisUserView === 'LOGIN') {
+                  return <LawMisUserLogin 
+                      onLoginSuccess={handleLoginSuccess} 
+                      onGoBack={handleGoBackToLawMisSelection} 
+                      onRegisterClick={handleRegisterClick}
+                   />;
+               } else { // lawMisUserView === 'REGISTER'
+                   return <LawMisUserRegister 
+                       onRegisterSuccess={handleRegisterSuccess}
+                       onGoBack={handleGoBackToLawMisLogin}
+                   />;
+               }
+           } else if (lawMisDashboardType === 'ADMIN') {
+               // LAW-MIS Admin only has login view
+               return <LawMisAdminLogin 
+                   onLoginSuccess={handleLoginSuccess} 
+                   onGoBack={handleGoBackToLawMisSelection} 
+               />;
+           }
+       } else { 
+            // Placeholder for logged-in LAW-MIS content
+            return (
+                 <Box sx={{p: 3}}> 
+                    <Typography variant="h5">Welcome to LAW-MIS ({lawMisLoggedInAs})</Typography>
+                    <Typography>This portal content is under development.</Typography>
+                    <Button onClick={handleGoBackToRoleSelection} variant="outlined" sx={{mt: 2}}>Log out / Back to Role Selection</Button>
+                </Box>
+            );
+       }
+    }
+
+    // Fallback
+    return <Box sx={{p:3}}> <Typography>Unexpected Application State</Typography> </Box>;
+  };
+
+  // --- Render the application --- 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-        <CssBaseline />
-        
-        {/* Top Navigation Bar */}
-        <AppBar position="fixed" sx={getContentWidth(sidebarOpen, drawerWidth)}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="toggle drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { sm: 'none' } }}
-            >
-              <MenuIcon />
-            </IconButton>
-            
-            {/* Breadcrumbs for submodules */}
-            {isManagementSubmodule ? (
-              <Breadcrumbs 
-                separator={<NavigateNextIcon fontSize="small" />} 
-                aria-label="breadcrumb"
-                sx={{ flexGrow: 1, color: 'inherit' }}
-              >
-                <Link 
-                  color="inherit" 
-                  href="#" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleModuleSelect(parentModule);
-                  }}
-                  sx={{ fontWeight: 'medium' }}
-                >
-                  {parentModule}
-                </Link>
-                <Typography color="inherit" sx={{ fontWeight: 'bold' }}>{subModule}</Typography>
-              </Breadcrumbs>
-            ) : (
-              <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                {currentModule}
-              </Typography>
-            )}
-            
-            <IconButton color="inherit" sx={{ mx: 1 }}>
-              <SearchIcon />
-            </IconButton>
-            <IconButton color="inherit" sx={{ mx: 1 }}>
-              <NotificationsIcon />
-            </IconButton>
-            <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.secondary.main }}>
-              U
-            </Avatar>
-          </Toolbar>
-        </AppBar>
-        
-        {/* Sidebar */}
-        <Sidebar 
-          open={sidebarOpen} 
-          onToggle={handleDrawerToggle} 
-          onModuleSelect={handleModuleSelect} 
-        />
-        
-        {/* Main Content */}
-        <Box
-          component="main"
-          sx={{
-            ...getContentWidth(sidebarOpen, drawerWidth),
-            pt: { xs: 8, sm: 9 },
-            flexGrow: 1,
-            bgcolor: 'background.default',
-          }}
-        >
-          {renderModuleContent()}
-        </Box>
-      </Box>
+      <CssBaseline />
+      {renderContent()} 
     </ThemeProvider>
-  )
+  );
 }
 
-export default App
+export default App;
