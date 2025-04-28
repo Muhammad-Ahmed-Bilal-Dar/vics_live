@@ -34,6 +34,9 @@ import LawMisSelection from './components/LawMisSelection/LawMisSelection'
 import LawMisUserLogin from './components/Login/LawMisUserLogin'
 import LawMisAdminLogin from './components/Login/LawMisAdminLogin'
 import LawMisUserRegister from './components/Register/LawMisUserRegister'
+import LawMisDashboard from './components/Dashboard/LawMisDashboard'
+import LAW_MISUserProfile from './components/Profile/LAW-MISUserProfile'
+import LAW_MISChangePassword from './components/Profile/LAW-MISChangePassword'
 
 // Calculate the width for the main content area based on drawer state
 const getContentWidth = (open: boolean, drawerWidth: number) => {
@@ -54,6 +57,7 @@ const getContentWidth = (open: boolean, drawerWidth: number) => {
 type SelectedRole = 'VICS_ADMIN' | 'LAW_MIS' | null;
 type LawMisDashboardType = 'USER' | 'ADMIN' | null;
 type LawMisUserView = 'LOGIN' | 'REGISTER';
+type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD';
 
 function App() {
   const drawerWidth = 240;
@@ -67,6 +71,7 @@ function App() {
   const [lawMisUserView, setLawMisUserView] = useState<LawMisUserView>('LOGIN');
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [lawMisLoggedInAs, setLawMisLoggedInAs] = useState<LawMisDashboardType>(null);
+  const [currentLawMisView, setCurrentLawMisView] = useState<CurrentLawMisView>('DASHBOARD');
 
   // Create theme based on current mode
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
@@ -78,7 +83,13 @@ function App() {
   const isManagementSubmodule = parentModule === 'Management';
 
   // --- VICS App Handlers ---
-  const handleDrawerToggle = () => setSidebarOpen(!sidebarOpen);
+  const handleDrawerToggle = () => {
+    // Need to decide where drawer state lives. Let's keep it in App for now
+    // and pass it down if needed, though LawMisDashboard might manage it internally
+    // For now, this handler might be specific to VICS sidebar.
+    // Let's assume LawMisDashboard handles its own drawer state toggle.
+    console.warn("VICS handleDrawerToggle called, may need adjustment for LAW-MIS sidebar toggle");
+  };
   const handleModuleSelect = (module: string) => setCurrentModule(module);
   const handleThemeChange = (newMode: PaletteMode) => setMode(newMode);
 
@@ -89,6 +100,7 @@ function App() {
     setLawMisUserView('LOGIN');
     setIsLoggedIn(false);
     setLawMisLoggedInAs(null);
+    setCurrentLawMisView('DASHBOARD');
   };
 
   const handleLawMisDashboardSelect = (dashboardType: LawMisDashboardType) => {
@@ -96,6 +108,7 @@ function App() {
     setLawMisUserView('LOGIN');
     setIsLoggedIn(false);
     setLawMisLoggedInAs(null);
+    setCurrentLawMisView('DASHBOARD');
   };
   
   const handleLoginSuccess = () => {
@@ -110,15 +123,17 @@ function App() {
            setLawMisLoggedInAs('ADMIN');
        }
     }
+    setCurrentLawMisView('DASHBOARD');
   };
 
-  // Go back from VICS Login to Role Selection
+  // Logout handler (resets everything, including the view)
   const handleGoBackToRoleSelection = () => {
       setSelectedRole(null);
       setIsLoggedIn(false);
       setLawMisDashboardType(null);
       setLawMisLoggedInAs(null);
       setLawMisUserView('LOGIN');
+      setCurrentLawMisView('DASHBOARD');
   };
 
   // Go back from LAW-MIS Login/Register pages to LAW-MIS Selection
@@ -127,6 +142,7 @@ function App() {
       setIsLoggedIn(false);
       setLawMisLoggedInAs(null);
       setLawMisUserView('LOGIN');
+      setCurrentLawMisView('DASHBOARD');
   };
   
   // Navigate to Register page
@@ -142,6 +158,17 @@ function App() {
   // Go back from Register page to Login page
   const handleGoBackToLawMisLogin = () => {
       setLawMisUserView('LOGIN');
+  };
+
+  // --- New handlers for navigating within LAW-MIS logged-in section ---
+  const navigateToLawMisUserProfile = () => {
+      setCurrentLawMisView('PROFILE');
+  };
+  const navigateToChangePassword = () => {
+      setCurrentLawMisView('CHANGE_PASSWORD');
+  };
+  const navigateToLawMisDashboard = () => {
+       setCurrentLawMisView('DASHBOARD');
   };
 
   // --- VICS App Content Rendering --- (Keep this separate for clarity)
@@ -267,14 +294,16 @@ function App() {
                />;
            }
        } else { 
-            // Placeholder for logged-in LAW-MIS content
-            return (
-                 <Box sx={{p: 3}}> 
-                    <Typography variant="h5">Welcome to LAW-MIS ({lawMisLoggedInAs})</Typography>
-                    <Typography>This portal content is under development.</Typography>
-                    <Button onClick={handleGoBackToRoleSelection} variant="outlined" sx={{mt: 2}}>Log out / Back to Role Selection</Button>
-                </Box>
-            );
+            // --- Render LAW-MIS Layout (AppBar, Sidebar, Content Area) --- 
+            // This structure is now always rendered when logged into LAW-MIS
+             return <LawMisDashboard 
+                    onLogout={handleGoBackToRoleSelection} 
+                    onNavigateToUserProfile={navigateToLawMisUserProfile}
+                    currentView={currentLawMisView} 
+                    onNavigateBack={navigateToLawMisDashboard} 
+                    onNavigateToChangePassword={navigateToChangePassword}
+                    onNavigateToMap={() => console.warn("Map navigation not implemented yet") }
+                />;
        }
     }
 

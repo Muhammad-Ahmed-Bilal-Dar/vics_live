@@ -35,13 +35,23 @@ const LawMisUserLogin: React.FC<LawMisUserLoginProps> = ({
     event.preventDefault();
     setError(''); 
 
-    // Placeholder login logic - replace with actual API call
-    console.log('LAW-MIS User Login attempt:', { username, password });
-    // Example: Check credentials (replace with real check)
-    if (username === 'user' && password === 'password') {
+    // --- Hardcoded Admin Login ---
+    if (username === 'admin' && password === 'admin') {
+      console.log('Admin login successful');
       onLoginSuccess(); 
+      return; // Exit after successful admin login
+    }
+
+    // --- Placeholder for regular user login logic --- 
+    // In a real app, you would make an API call here
+    console.log('LAW-MIS User Login attempt (non-admin):', { username, password });
+    // Example check (remove or replace with API call)
+    if (username === 'user' && password === 'password') { // Example placeholder user
+        console.log('Placeholder user login successful');
+        onLoginSuccess(); 
     } else {
-      setError('Invalid Username or Password');
+      // Keep this error for non-admin attempts that fail
+      setError('Invalid Username or Password'); 
     }
   };
 
