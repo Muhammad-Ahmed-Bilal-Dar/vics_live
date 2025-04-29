@@ -44,6 +44,7 @@ import LawMisLogo from '../../assets/LAW-MIS-logo.svg';
 import LawMisSidebar from '../Sidebar/LawMisSidebar'; // <-- Import the new sidebar component
 import LAW_MISUserProfile from '../Profile/LAW-MISUserProfile'; // <-- Updated Import
 import LAW_MISChangePassword from '../Profile/LAW-MISChangePassword'; // <-- Correctly named component
+import LawMisAddWorkshopForm from '../LawMisWorkshopForm/LawMisAddWorkshopForm'; // <-- Import the new form component
 
 // --- Drawer Dimensions (Keep for calculating main content margin) --- 
 const drawerWidth = 0;
@@ -72,7 +73,7 @@ const cardStyles = {
 };
 
 // --- Component Props --- Define types for props
-type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD'; // <-- Update type
+type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP'; // <-- Add ADD_WORKSHOP
 
 interface LawMisDashboardProps {
     onLogout: () => void; 
@@ -81,6 +82,7 @@ interface LawMisDashboardProps {
     onNavigateToChangePassword: () => void; 
     onNavigateToUserProfile: () => void;
     onNavigateToMap: () => void;
+    onNavigateToAddWorkshop: () => void; // <-- Add new prop
 }
 
 // --- Dashboard Component --- 
@@ -91,6 +93,7 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
     onNavigateToChangePassword, 
     onNavigateToUserProfile,
     onNavigateToMap,
+    onNavigateToAddWorkshop, // <-- Destructure new prop
 }) => { 
   console.log(`LawMisDashboard rendering view: ${currentView}`); 
   const theme = useTheme();
@@ -134,7 +137,8 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
   ];
 
   const handleAddNewWorkshop = () => {
-    console.log("Add New Workshop Clicked"); 
+    console.log("Add New Workshop Clicked - Navigating..."); 
+    onNavigateToAddWorkshop(); // <-- Call the handler from props
   };
 
   // --- Dashboard-specific content --- 
@@ -281,7 +285,7 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
         </Menu>
 
       {/* Render the new LawMisSidebar component */}
-      <LawMisSidebar open={drawerOpen} />
+      <LawMisSidebar open={drawerOpen} onNavigateBack={onNavigateBack} />
 
       {/* Main Content Area */}
       <Box 
@@ -303,6 +307,7 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
             {currentView === 'DASHBOARD' && renderDashboardContent()} 
             {currentView === 'PROFILE' && <LAW_MISUserProfile onGoBack={onNavigateBack} />}
             {currentView === 'CHANGE_PASSWORD' && <LAW_MISChangePassword onGoBack={onNavigateBack} />}
+            {currentView === 'ADD_WORKSHOP' && <LawMisAddWorkshopForm onNavigateBack={onNavigateBack} />} {/* <-- Render new form */}
 
             {/* Map View - Commented out as component doesn't exist yetss */}
             {/* {currentView === 'MAP' && <PoliceStationsMap />} */}

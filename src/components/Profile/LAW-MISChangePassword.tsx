@@ -71,8 +71,8 @@ const LAW_MISChangePassword: React.FC<LAW_MISChangePasswordProps> = ({ onGoBack 
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            {/* Optional Back Button */} 
-            {onGoBack && (
+            {/* Optional Back Button - Removed */}
+            {/* {onGoBack && (
                 <Button 
                     startIcon={<ArrowBackIcon />} 
                     onClick={onGoBack} 
@@ -80,7 +80,7 @@ const LAW_MISChangePassword: React.FC<LAW_MISChangePasswordProps> = ({ onGoBack 
                 >
                     Back to Dashboard
                 </Button>
-            )}
+            )} */}
 
             <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
                 Change Password

@@ -85,11 +85,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 // --- Component Props ---
 interface LawMisSidebarProps {
     open: boolean;
-    // onToggle: () => void; // Not needed here if toggle button is in AppBar
+    onNavigateBack: () => void; // Add prop for navigating back to dashboard
 }
 
 // --- Sidebar Component --- 
-const LawMisSidebar: React.FC<LawMisSidebarProps> = ({ open }) => {
+const LawMisSidebar: React.FC<LawMisSidebarProps> = ({ open, onNavigateBack }) => {
     const theme = useTheme();
     // State for collapsible list remains internal to the sidebar
     const [openListings, setOpenListings] = useState(true);
@@ -104,6 +104,19 @@ const LawMisSidebar: React.FC<LawMisSidebarProps> = ({ open }) => {
             <DrawerHeader /> {/* Provides space for AppBar */}
             <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)' }} />
             <List component="nav">
+                 {/* Dashboard Link */}
+                 <ListItem disablePadding sx={{ display: 'block' }}>
+                    <ListItemButton 
+                        sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5 }}
+                        onClick={onNavigateBack} // Call the navigation handler
+                    >
+                        <ListItemIcon sx={{ minWidth: 0, mr: open ? 3 : 'auto', justifyContent: 'center', color: 'inherit' }}>
+                            {/* TODO: Replace with appropriate Dashboard icon */}
+                            <InboxIcon /> 
+                        </ListItemIcon>
+                        <ListItemText primary="DASHBOARD" sx={{ opacity: open ? 1 : 0 }} />
+                    </ListItemButton>
+                </ListItem>
                  {/* User Profile */}
                  <ListItem disablePadding sx={{ display: 'block' }}>
                     <ListItemButton sx={{ minHeight: 48, justifyContent: open ? 'initial' : 'center', px: 2.5 }}>
