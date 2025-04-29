@@ -42,10 +42,13 @@ import LAW_MISChangePassword from './components/Profile/LAW-MISChangePassword'
 const getContentWidth = (open: boolean, drawerWidth: number) => {
   return {
     width: {
-      sm: `calc(100% - ${open ? drawerWidth : 64}px)`,
+      sm: `calc(100% - ${open ? drawerWidth : 50}px)`,
       xs: '100%',
     },
-   
+    marginLeft: {
+      sm: open ? `${drawerWidth}px` : '50px',
+      xs: 0,
+    },
     transition: (theme: any) => theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -60,7 +63,7 @@ type LawMisUserView = 'LOGIN' | 'REGISTER';
 type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP';
 
 function App() {
-  const drawerWidth = 240;
+  const drawerWidth = 200;
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentModule, setCurrentModule] = useState('Dashboard');
   const [mode, setMode] = useState<PaletteMode>('light');
@@ -84,11 +87,7 @@ function App() {
 
   // --- VICS App Handlers ---
   const handleDrawerToggle = () => {
-    // Need to decide where drawer state lives. Let's keep it in App for now
-    // and pass it down if needed, though LawMisDashboard might manage it internally
-    // For now, this handler might be specific to VICS sidebar.
-    // Let's assume LawMisDashboard handles its own drawer state toggle.
-    console.warn("VICS handleDrawerToggle called, may need adjustment for LAW-MIS sidebar toggle");
+    setSidebarOpen(!sidebarOpen);
   };
   const handleModuleSelect = (module: string) => setCurrentModule(module);
   const handleThemeChange = (newMode: PaletteMode) => setMode(newMode);
@@ -232,14 +231,21 @@ function App() {
         // Show VICS Main App Layout
         return (
           <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-            <AppBar position="fixed" sx={getContentWidth(sidebarOpen, drawerWidth)}>
+            <AppBar 
+              position="fixed" 
+              sx={{
+                width: '100%',
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+                bgcolor: theme.palette.secondary.main
+              }}
+            >
               <Toolbar>
                 <IconButton
                   color="inherit"
                   aria-label="toggle drawer"
                   edge="start"
                   onClick={handleDrawerToggle}
-                  sx={{ mr: 2, display: { sm: 'none' } }}
+                  sx={{ mr: 2 }}
                 >
                   <MenuIcon />
                 </IconButton>
@@ -258,9 +264,23 @@ function App() {
                 <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.secondary.main }}> U </Avatar>
               </Toolbar>
             </AppBar>
-            <Sidebar open={sidebarOpen} onToggle={handleDrawerToggle} onModuleSelect={handleModuleSelect} />
-            <Box component="main" sx={{ ...getContentWidth(sidebarOpen, drawerWidth), pt: { xs: 8, sm: 9 }, flexGrow: 1, bgcolor: 'background.default' }}>
-              {renderVicsAppContent()} 
+            <Box sx={{ display: 'flex' }}>
+              <Sidebar open={sidebarOpen} onToggle={handleDrawerToggle} onModuleSelect={handleModuleSelect} />
+              <Box 
+                component="main" 
+                sx={{ 
+                  flexGrow: 1,
+                  pt: { xs: 8, sm: 9 },
+                  width: { sm: `calc(100% - ${sidebarOpen ? 200 : 50}px)`, xs: '100%' },
+                  transition: (theme) => theme.transitions.create(['width'], {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.enteringScreen,
+                  }),
+                  bgcolor: 'background.default',
+                }}
+              >
+                {renderVicsAppContent()} 
+              </Box>
             </Box>
           </Box>
         );

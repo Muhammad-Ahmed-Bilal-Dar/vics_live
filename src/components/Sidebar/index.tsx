@@ -12,7 +12,9 @@ import {
   useTheme,
   Divider,
   styled,
-  Collapse
+  Collapse,
+  Theme, 
+  CSSObject
 } from '@mui/material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -31,7 +33,99 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 // Drawer width when open
-const drawerWidth = 240;
+const drawerWidth = 220;
+const closedDrawerWidth = 50;
+
+// Drawer transition mixins
+const openedMixin = (theme: Theme): CSSObject => ({
+  width: drawerWidth,
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: 'hidden',
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  borderRight: 'none',
+  marginTop: theme.mixins.toolbar.minHeight,
+  [theme.breakpoints.up('sm')]: {
+    marginTop: theme.mixins.toolbar.minHeight as number + 8,
+  },
+  height: `calc(100% - ${theme.mixins.toolbar.minHeight}px)`,
+  [theme.breakpoints.up('sm')]: {
+    height: `calc(100% - ${(theme.mixins.toolbar.minHeight as number) + 8}px)`,
+  },
+});
+
+const closedMixin = (theme: Theme): CSSObject => ({
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  overflowX: 'hidden',
+  width: `${closedDrawerWidth}px`,
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  borderRight: 'none',
+  marginTop: theme.mixins.toolbar.minHeight,
+  [theme.breakpoints.up('sm')]: {
+    marginTop: theme.mixins.toolbar.minHeight as number + 8,
+  },
+  height: `calc(100% - ${theme.mixins.toolbar.minHeight}px)`,
+  [theme.breakpoints.up('sm')]: {
+    height: `calc(100% - ${(theme.mixins.toolbar.minHeight as number) + 8}px)`,
+  },
+});
+
+// Mobile drawer mixin
+const mobileMixin = (theme: Theme): CSSObject => ({
+  width: '100%',
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: 'hidden',
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  borderRight: 'none',
+  marginTop: theme.mixins.toolbar.minHeight,
+  height: `calc(100% - ${theme.mixins.toolbar.minHeight}px)`,
+});
+
+// Header for spacing inside Drawer
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+}));
+
+// Styled component for the drawer
+const StyledDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => {
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
+    return {
+      width: drawerWidth,
+      flexShrink: 0,
+      whiteSpace: 'nowrap',
+      boxSizing: 'border-box',
+      ...(open && !isMobile && {
+        ...openedMixin(theme),
+        '& .MuiDrawer-paper': openedMixin(theme),
+      }),
+      ...(!open && !isMobile && {
+        ...closedMixin(theme),
+        '& .MuiDrawer-paper': closedMixin(theme),
+      }),
+      ...(isMobile && open && {
+        ...mobileMixin(theme),
+        '& .MuiDrawer-paper': mobileMixin(theme),
+      }),
+    };
+  }
+);
 
 // Styled component for the toggle button
 const DrawerToggleButton = styled(IconButton)(({ theme }) => ({
@@ -46,7 +140,7 @@ const DrawerToggleButton = styled(IconButton)(({ theme }) => ({
   padding: theme.spacing(0.5),
   '&:hover': {
     backgroundColor: theme.palette.secondary.main,
-    color: '#ffffff',
+    color: theme.palette.secondary.contrastText,
   },
   transition: theme.transitions.create(['left', 'background-color'], {
     easing: theme.transitions.easing.sharp,
@@ -65,92 +159,88 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [managementOpen, setManagementOpen] = useState(false);
   
-  const drawerVariant = isMobile ? 'temporary' : 'persistent';
+  // Handler to select a module and provide feedback that it was selected
+  const handleModuleSelect = (moduleName: string) => {
+    console.log(`Selected module: ${moduleName}`); // Provide feedback
+    onModuleSelect(moduleName); // Call the parent handler
+    
+    // Close the drawer on mobile after selection
+    if (isMobile) {
+      onToggle();
+    }
+  };
   
   const handleManagementClick = () => {
     setManagementOpen(!managementOpen);
   };
   
   const modules = [
-    { name: 'Dashboard', icon: <DashboardIcon /> },
-    { name: 'Station', icon: <SensorsIcon /> },
-    { name: 'Reports', icon: <AssessmentIcon /> }, 
-    { name: 'Analytics', icon: <BarChartIcon /> },
-    { name: 'Appointments', icon: <CalendarMonthIcon /> },
+    { name: 'Dashboard', icon: <DashboardIcon fontSize="small" /> },
+    { name: 'Station', icon: <SensorsIcon fontSize="small" /> },
+    { name: 'Reports', icon: <AssessmentIcon fontSize="small" /> }, 
+    { name: 'Analytics', icon: <BarChartIcon fontSize="small" /> },
+    { name: 'Appointments', icon: <CalendarMonthIcon fontSize="small" /> },
   ];
   
   const managementSubmenus = [
-    { name: 'User Management', icon: <PersonIcon />, fullPath: 'Management/User' },
-    { name: 'Station Management', icon: <EvStationIcon />, fullPath: 'Management/Station' },
-    { name: 'Area Management', icon: <LocationOnIcon />, fullPath: 'Management/Area' },
-    { name: 'Appointment Management', icon: <EventNoteIcon />, fullPath: 'Management/Appointment' },
+    { name: 'User management', icon: <PersonIcon fontSize="small" />, fullPath: 'Management/User' },
+    { name: 'Station management', icon: <EvStationIcon fontSize="small" />, fullPath: 'Management/Station' },
+    { name: 'Area management', icon: <LocationOnIcon fontSize="small" />, fullPath: 'Management/Area' },
+    { name: 'Appointment management', icon: <EventNoteIcon fontSize="small" />, fullPath: 'Management/Appointment' },
   ];
 
   return (
     <>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            boxSizing: 'border-box',
-            transition: theme.transitions.create('width', {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
-            ...(open ? {
-              width: drawerWidth,
-            } : {
-              width: theme.spacing(7),
-              overflowX: 'hidden',
-            }),
-          },
-        }}
-        variant={drawerVariant}
-        anchor="left"
+      <StyledDrawer
+        variant={isMobile ? 'temporary' : 'permanent'}
         open={open}
         onClose={isMobile ? onToggle : undefined}
       >
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'flex-end', 
-          p: 1 
-        }}>
-          <IconButton onClick={onToggle}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </Box>
-        <Divider />
-        <List>
+        <DrawerHeader /> {/* Provides space for AppBar */}
+        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)' }} />
+        <List component="nav" sx={{ p: 0 }}>
           {/* Regular Modules */}
           {modules.map((module) => (
             <ListItem 
               key={module.name} 
               disablePadding 
               sx={{ display: 'block' }}
-              onClick={() => onModuleSelect(module.name)}
+              onClick={() => handleModuleSelect(module.name)}
             >
               <ListItemButton
                 sx={{
-                  minHeight: 48,
+                  minHeight: 40,
                   justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
+                  px: 2,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: open ? 3 : 'auto',
+                    mr: open ? 2 : 'auto',
                     justifyContent: 'center',
+                    color: 'inherit'
                   }}
                 >
                   {module.icon}
                 </ListItemIcon>
                 <ListItemText 
                   primary={module.name} 
-                  sx={{ opacity: open ? 1 : 0 }} 
-                  primaryTypographyProps={{ variant: 'sidebarMenuItem' }}
+                  sx={{ 
+                    opacity: open ? 1 : 0,
+                    '& .MuiTypography-root': {
+                      overflow: 'visible',
+                      whiteSpace: 'normal',
+                      width: '100%',
+                      lineHeight: 1.2
+                    }
+                  }} 
+                  primaryTypographyProps={{ 
+                    fontSize: '0.8rem'
+                  }}
                 />
               </ListItemButton>
             </ListItem>
@@ -164,26 +254,40 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
             <ListItemButton
               onClick={handleManagementClick}
               sx={{
-                minHeight: 48,
+                minHeight: 40,
                 justifyContent: open ? 'initial' : 'center',
-                px: 2.5,
+                px: 2,
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                }
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 3 : 'auto',
+                  mr: open ? 2 : 'auto',
                   justifyContent: 'center',
+                  color: 'inherit'
                 }}
               >
-                <ManageAccountsIcon />
+                <ManageAccountsIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText 
                 primary="Management" 
-                sx={{ opacity: open ? 1 : 0 }} 
-                primaryTypographyProps={{ variant: 'sidebarMenuItem' }}
+                sx={{ 
+                  opacity: open ? 1 : 0,
+                  '& .MuiTypography-root': {
+                    overflow: 'visible',
+                    whiteSpace: 'normal',
+                    width: '100%',
+                    lineHeight: 1.2
+                  }
+                }} 
+                primaryTypographyProps={{ 
+                  fontSize: '0.8rem'
+                }}
               />
-              {open && (managementOpen ? <ExpandLess /> : <ExpandMore />)}
+              {open && (managementOpen ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />)}
             </ListItemButton>
             
             {/* Submenu Items - Only visible when sidebar is open */}
@@ -193,15 +297,37 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
                   {managementSubmenus.map((submenu) => (
                     <ListItemButton 
                       key={submenu.name}
-                      sx={{ pl: 4 }}
-                      onClick={() => onModuleSelect(submenu.fullPath)}
+                      sx={{ 
+                        pl: 3,
+                        minHeight: 36,
+                        justifyContent: open ? 'initial' : 'center',
+                      }}
+                      onClick={() => handleModuleSelect(submenu.fullPath)}
                     >
-                      <ListItemIcon>
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: open ? 2 : 'auto',
+                          justifyContent: 'center',
+                          color: 'inherit'
+                        }}
+                      >
                         {submenu.icon}
                       </ListItemIcon>
                       <ListItemText 
                         primary={submenu.name} 
-                        primaryTypographyProps={{ variant: 'sidebarMenuItem' }}
+                        sx={{ 
+                          opacity: open ? 1 : 0,
+                          '& .MuiTypography-root': {
+                            overflow: 'visible',
+                            whiteSpace: 'normal',
+                            width: '100%',
+                            lineHeight: 1.2
+                          }
+                        }} 
+                        primaryTypographyProps={{ 
+                          fontSize: '0.75rem'
+                        }}
                       />
                     </ListItemButton>
                   ))}
@@ -214,44 +340,47 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
           <ListItem 
             disablePadding 
             sx={{ display: 'block' }}
-            onClick={() => onModuleSelect('Settings')}
+            onClick={() => handleModuleSelect('Settings')}
           >
             <ListItemButton
               sx={{
-                minHeight: 48,
+                minHeight: 40,
                 justifyContent: open ? 'initial' : 'center',
-                px: 2.5,
+                px: 2,
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                }
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 3 : 'auto',
+                  mr: open ? 2 : 'auto',
                   justifyContent: 'center',
+                  color: 'inherit'
                 }}
               >
-                <SettingsIcon />
+                <SettingsIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText 
                 primary="Settings" 
-                sx={{ opacity: open ? 1 : 0 }} 
-                primaryTypographyProps={{ variant: 'sidebarMenuItem' }}
+                sx={{ 
+                  opacity: open ? 1 : 0,
+                  '& .MuiTypography-root': {
+                    overflow: 'visible',
+                    whiteSpace: 'normal',
+                    width: '100%',
+                    lineHeight: 1.2
+                  }
+                }} 
+                primaryTypographyProps={{ 
+                  fontSize: '0.8rem'
+                }}
               />
             </ListItemButton>
           </ListItem>
         </List>
-      </Drawer>
-      
-      {!isMobile && (
-        <DrawerToggleButton
-          onClick={onToggle}
-          sx={{
-            left: open ? drawerWidth : 0,
-          }}
-        >
-          {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-        </DrawerToggleButton>
-      )}
+      </StyledDrawer>
     </>
   );
 };
