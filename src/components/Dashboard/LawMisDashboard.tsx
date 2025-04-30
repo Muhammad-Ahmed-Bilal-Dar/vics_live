@@ -68,7 +68,7 @@ const cardStyles = {
     justifyContent: 'space-between',
     p: 2,
     borderRadius: 2,
-    color: '#fff', 
+    color: (theme: Theme) => theme.palette.primary.contrastText, 
     height: '100%', 
 };
 
@@ -130,10 +130,10 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
 
   // Placeholder data
   const summaryData = [
-    { title: 'VEHICLE SEARCH', count: 0, icon: <SearchIcon sx={{ fontSize: 40 }} />, bgColor: '#29b6f6' }, 
-    { title: 'NEW REGISTERED VEHICLES', count: 0, icon: <DirectionsCarIcon sx={{ fontSize: 40 }} />, bgColor: '#ab47bc' }, 
-    { title: 'INSPECTION FAILED', count: 0, icon: <HighlightOffIcon sx={{ fontSize: 40 }} />, bgColor: '#ef5350' },
-    { title: 'INSPECTION PASSED', count: 0, icon: <CheckCircleOutlineIcon sx={{ fontSize: 40 }} />, bgColor: '#26a69a' }, 
+    { title: 'VEHICLE SEARCH', count: 0, icon: <SearchIcon sx={{ fontSize: 40 }} />, bgColor: (theme: Theme) => theme.palette.primary.light }, 
+    { title: 'NEW REGISTERED VEHICLES', count: 0, icon: <DirectionsCarIcon sx={{ fontSize: 40 }} />, bgColor: (theme: Theme) => theme.palette.primary.light }, 
+    { title: 'INSPECTION FAILED', count: 0, icon: <HighlightOffIcon sx={{ fontSize: 40 }} />, bgColor: (theme: Theme) => theme.palette.primary.light },
+    { title: 'INSPECTION PASSED', count: 0, icon: <CheckCircleOutlineIcon sx={{ fontSize: 40 }} />, bgColor: (theme: Theme) => theme.palette.primary.light }, 
   ];
 
   const handleAddNewWorkshop = () => {
@@ -165,10 +165,10 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
               <Grid item xs={12} sm={6} md={3} key={index} sx={{ minWidth: 200 }}>
                     <Paper elevation={3} sx={{ ...cardStyles, backgroundColor: item.bgColor }}>
                        <Box>
-                          <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 'bold' }}>{item.title}</Typography>
+                          <Typography variant="subtitle1" sx={{ color: 'inherit', fontWeight: 'bold' }}>{item.title}</Typography>
                           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{item.count}</Typography>
                        </Box>
-                       <IconButton sx={{ color: '#fff', backgroundColor: 'rgba(255, 255, 255, 0.2)', borderRadius: '50%' }}>
+                       <IconButton sx={{ color: 'inherit', backgroundColor: 'rgba(255, 255, 255, 0.2)', borderRadius: '50%' }}>
                           {React.cloneElement(item.icon, { sx: { fontSize: 32 } })}
                        </IconButton>
                   </Paper>

@@ -32,13 +32,9 @@ import EvStationIcon from '@mui/icons-material/EvStation';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
-// Drawer width when open
-const drawerWidth = 220;
-const closedDrawerWidth = 50;
-
 // Drawer transition mixins
 const openedMixin = (theme: Theme): CSSObject => ({
-  width: drawerWidth,
+  width: theme.sidebar.drawerWidth,
   transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
@@ -63,7 +59,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: 'hidden',
-  width: `${closedDrawerWidth}px`,
+  width: `${theme.sidebar.closedDrawerWidth}px`,
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.primary.contrastText,
   borderRight: 'none',
@@ -107,7 +103,7 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'ope
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     
     return {
-      width: drawerWidth,
+      width: theme.sidebar.drawerWidth,
       flexShrink: 0,
       whiteSpace: 'nowrap',
       boxSizing: 'border-box',
@@ -197,7 +193,7 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
         onClose={isMobile ? onToggle : undefined}
       >
         <DrawerHeader /> {/* Provides space for AppBar */}
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)' }} />
+        <Divider />
         <List component="nav" sx={{ p: 0 }}>
           {/* Regular Modules */}
           {modules.map((module) => (
@@ -209,18 +205,15 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
             >
               <ListItemButton
                 sx={{
-                  minHeight: 40,
+                  minHeight: theme.sidebar.itemHeight,
                   justifyContent: open ? 'initial' : 'center',
                   px: 2,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                  }
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: open ? 2 : 'auto',
+                    mr: open ? theme.sidebar.iconMargin : 'auto',
                     justifyContent: 'center',
                     color: 'inherit'
                   }}
@@ -229,17 +222,9 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
                 </ListItemIcon>
                 <ListItemText 
                   primary={module.name} 
-                  sx={{ 
-                    opacity: open ? 1 : 0,
-                    '& .MuiTypography-root': {
-                      overflow: 'visible',
-                      whiteSpace: 'normal',
-                      width: '100%',
-                      lineHeight: 1.2
-                    }
-                  }} 
+                  sx={{ opacity: open ? 1 : 0 }} 
                   primaryTypographyProps={{ 
-                    fontSize: '0.8rem'
+                    variant: 'sidebarMenuItem' 
                   }}
                 />
               </ListItemButton>
@@ -254,18 +239,15 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
             <ListItemButton
               onClick={handleManagementClick}
               sx={{
-                minHeight: 40,
+                minHeight: theme.sidebar.itemHeight,
                 justifyContent: open ? 'initial' : 'center',
                 px: 2,
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                }
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 2 : 'auto',
+                  mr: open ? theme.sidebar.iconMargin : 'auto',
                   justifyContent: 'center',
                   color: 'inherit'
                 }}
@@ -274,17 +256,9 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
               </ListItemIcon>
               <ListItemText 
                 primary="Management" 
-                sx={{ 
-                  opacity: open ? 1 : 0,
-                  '& .MuiTypography-root': {
-                    overflow: 'visible',
-                    whiteSpace: 'normal',
-                    width: '100%',
-                    lineHeight: 1.2
-                  }
-                }} 
+                sx={{ opacity: open ? 1 : 0 }} 
                 primaryTypographyProps={{ 
-                  fontSize: '0.8rem'
+                  variant: 'sidebarMenuItem' 
                 }}
               />
               {open && (managementOpen ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />)}
@@ -298,8 +272,8 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
                     <ListItemButton 
                       key={submenu.name}
                       sx={{ 
-                        pl: 3,
-                        minHeight: 36,
+                        pl: theme.sidebar.subItemPadding,
+                        minHeight: theme.sidebar.subItemHeight,
                         justifyContent: open ? 'initial' : 'center',
                       }}
                       onClick={() => handleModuleSelect(submenu.fullPath)}
@@ -307,7 +281,7 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
                       <ListItemIcon
                         sx={{
                           minWidth: 0,
-                          mr: open ? 2 : 'auto',
+                          mr: open ? theme.sidebar.iconMargin : 'auto',
                           justifyContent: 'center',
                           color: 'inherit'
                         }}
@@ -316,17 +290,9 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
                       </ListItemIcon>
                       <ListItemText 
                         primary={submenu.name} 
-                        sx={{ 
-                          opacity: open ? 1 : 0,
-                          '& .MuiTypography-root': {
-                            overflow: 'visible',
-                            whiteSpace: 'normal',
-                            width: '100%',
-                            lineHeight: 1.2
-                          }
-                        }} 
+                        sx={{ opacity: open ? 1 : 0 }}
                         primaryTypographyProps={{ 
-                          fontSize: '0.75rem'
+                          variant: 'sidebarSubMenuItem'
                         }}
                       />
                     </ListItemButton>
@@ -344,18 +310,15 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
           >
             <ListItemButton
               sx={{
-                minHeight: 40,
+                minHeight: theme.sidebar.itemHeight,
                 justifyContent: open ? 'initial' : 'center',
                 px: 2,
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                }
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 2 : 'auto',
+                  mr: open ? theme.sidebar.iconMargin : 'auto',
                   justifyContent: 'center',
                   color: 'inherit'
                 }}
@@ -364,17 +327,9 @@ const Sidebar = ({ open, onToggle, onModuleSelect }: SidebarProps) => {
               </ListItemIcon>
               <ListItemText 
                 primary="Settings" 
-                sx={{ 
-                  opacity: open ? 1 : 0,
-                  '& .MuiTypography-root': {
-                    overflow: 'visible',
-                    whiteSpace: 'normal',
-                    width: '100%',
-                    lineHeight: 1.2
-                  }
-                }} 
+                sx={{ opacity: open ? 1 : 0 }} 
                 primaryTypographyProps={{ 
-                  fontSize: '0.8rem'
+                  variant: 'sidebarMenuItem'
                 }}
               />
             </ListItemButton>

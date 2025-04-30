@@ -29,6 +29,10 @@ const getDesignTokens = (mode: PaletteMode): ThemeOptions => ({
           charger: {
             dc: '#1976d2', // blue
             ac: '#ff9800', // orange
+          },
+          divider: 'rgba(255, 255, 255, 0.12)', // Divider color used in Sidebar
+          action: {
+            hover: 'rgba(255, 255, 255, 0.1)' // Hover color used in Sidebar
           }
         }
       : {
@@ -59,18 +63,63 @@ const getDesignTokens = (mode: PaletteMode): ThemeOptions => ({
           charger: {
             dc: '#42a5f5', // lighter blue for dark mode
             ac: '#ffb74d', // lighter orange for dark mode
+          },
+          divider: 'rgba(255, 255, 255, 0.12)', // Divider color used in Sidebar
+          action: {
+            hover: 'rgba(255, 255, 255, 0.1)' // Hover color used in Sidebar
           }
         }),
   },
+  // Sidebar dimensions
+  sidebar: {
+    drawerWidth: 220,
+    closedDrawerWidth: 50,
+    itemHeight: 40,
+    subItemHeight: 36,
+    subItemPadding: 3,
+    iconMargin: 2
+  },
+  // Typography settings
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     fontSize: 14, // Base font size
     // Sidebar menu text styling
     sidebarMenuItem: {
-      fontSize: '0.875rem', // Smaller font size for sidebar items
+      fontSize: '0.8rem', // Font size for sidebar items
       fontWeight: 400,
+      overflow: 'visible',
+      whiteSpace: 'normal',
+      lineHeight: 1.2,
+    },
+    sidebarSubMenuItem: {
+      fontSize: '0.75rem', // Font size for submenu items
+      fontWeight: 400,
+      overflow: 'visible',
+      whiteSpace: 'normal',
+      lineHeight: 1.2,
+    }
+  },
+  spacing: 8, // Base spacing unit (8px)
+  // Transitions
+  transitions: {
+    easing: {
+      // Default easing curves
+      sharp: 'cubic-bezier(0.4, 0, 0.6, 1)',
+      easeOut: 'cubic-bezier(0.0, 0, 0.2, 1)',
+      easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+    duration: {
+      shortest: 150,
+      shorter: 200,
+      short: 250,
+      standard: 300,
+      complex: 375,
+      enteringScreen: 225,
+      leavingScreen: 195,
     },
   },
+  // Component overrides
   components: {
     MuiAppBar: {
       styleOverrides: {
@@ -94,6 +143,15 @@ const getDesignTokens = (mode: PaletteMode): ThemeOptions => ({
         },
       },
     },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.1)'
+          }
+        }
+      }
+    },
     MuiListItemText: {
       styleOverrides: {
         primary: {
@@ -101,6 +159,13 @@ const getDesignTokens = (mode: PaletteMode): ThemeOptions => ({
         },
       },
     },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: 'rgba(255, 255, 255, 0.12)'
+        }
+      }
+    }
   },
 });
 
@@ -141,10 +206,35 @@ declare module '@mui/material/styles' {
 
   interface TypographyVariants {
     sidebarMenuItem: React.CSSProperties;
+    sidebarSubMenuItem: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
     sidebarMenuItem?: React.CSSProperties;
+    sidebarSubMenuItem?: React.CSSProperties;
+  }
+  
+  // Add custom theme section for sidebar
+  interface Theme {
+    sidebar: {
+      drawerWidth: number;
+      closedDrawerWidth: number;
+      itemHeight: number;
+      subItemHeight: number;
+      subItemPadding: number;
+      iconMargin: number;
+    }
+  }
+  
+  interface ThemeOptions {
+    sidebar?: {
+      drawerWidth?: number;
+      closedDrawerWidth?: number;
+      itemHeight?: number;
+      subItemHeight?: number;
+      subItemPadding?: number;
+      iconMargin?: number;
+    }
   }
 }
 
@@ -152,6 +242,7 @@ declare module '@mui/material/styles' {
 declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     sidebarMenuItem: true;
+    sidebarSubMenuItem: true;
   }
 }
 
