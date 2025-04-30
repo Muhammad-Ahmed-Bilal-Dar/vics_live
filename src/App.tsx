@@ -265,7 +265,7 @@ function App() {
               </Toolbar>
             </AppBar>
             <Box sx={{ display: 'flex' }}>
-              <Sidebar open={sidebarOpen} onToggle={handleDrawerToggle} onModuleSelect={handleModuleSelect} />
+            <Sidebar open={sidebarOpen} onToggle={handleDrawerToggle} onModuleSelect={handleModuleSelect} />
               <Box 
                 component="main" 
                 sx={{ 
@@ -279,7 +279,7 @@ function App() {
                   bgcolor: 'background.default',
                 }}
               >
-                {renderVicsAppContent()} 
+              {renderVicsAppContent()} 
               </Box>
             </Box>
           </Box>

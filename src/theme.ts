@@ -30,6 +30,13 @@ const getDesignTokens = (mode: PaletteMode): ThemeOptions => ({
             dc: '#1976d2', // blue
             ac: '#ff9800', // orange
           },
+          // Dashboard card colors with RGBA
+          dashboardCard: {
+            vehicleSearch: 'rgba(165, 214, 167, 0.9)', // Light green with alpha
+            newVehicles: 'rgba(129, 199, 132, 0.9)', // Mid green with alpha
+            inspectionFailed: 'rgba(239, 83, 80, 0.9)', // Red with alpha
+            inspectionPassed: 'rgba(76, 175, 80, 0.9)', // Green with alpha
+          },
           divider: 'rgba(255, 255, 255, 0.12)', // Divider color used in Sidebar
           action: {
             hover: 'rgba(255, 255, 255, 0.1)' // Hover color used in Sidebar
@@ -63,6 +70,13 @@ const getDesignTokens = (mode: PaletteMode): ThemeOptions => ({
           charger: {
             dc: '#42a5f5', // lighter blue for dark mode
             ac: '#ffb74d', // lighter orange for dark mode
+          },
+          // Dashboard card colors with RGBA for dark mode
+          dashboardCard: {
+            vehicleSearch: 'rgba(129, 199, 132, 0.9)', // Lighter green with alpha for dark mode
+            newVehicles: 'rgba(102, 187, 106, 0.9)', // Lighter green with alpha for dark mode
+            inspectionFailed: 'rgba(239, 83, 80, 0.9)', // Red with alpha
+            inspectionPassed: 'rgba(102, 187, 106, 0.9)', // Lighter green with alpha for dark mode
           },
           divider: 'rgba(255, 255, 255, 0.12)', // Divider color used in Sidebar
           action: {
@@ -187,6 +201,12 @@ declare module '@mui/material/styles' {
       dc: string;
       ac: string;
     };
+    dashboardCard: {
+      vehicleSearch: string;
+      newVehicles: string;
+      inspectionFailed: string;
+      inspectionPassed: string;
+    };
   }
   
   interface PaletteOptions {
@@ -201,6 +221,12 @@ declare module '@mui/material/styles' {
     charger?: {
       dc?: string;
       ac?: string;
+    };
+    dashboardCard?: {
+      vehicleSearch?: string;
+      newVehicles?: string;
+      inspectionFailed?: string;
+      inspectionPassed?: string;
     };
   }
 

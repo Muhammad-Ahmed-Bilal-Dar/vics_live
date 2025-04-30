@@ -66,7 +66,7 @@ const mobileMixin = (theme: Theme): CSSObject => ({
   overflowX: 'hidden',
   backgroundColor: theme.palette.primary.main, 
   color: theme.palette.getContrastText(theme.palette.primary.main), 
-  borderRight: 'none',
+  borderRight: 'none', 
 });
 
 // --- Styled Drawer Component --- 
@@ -75,22 +75,22 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'ope
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     
     return {
-      width: drawerWidth, 
-      flexShrink: 0,
-      whiteSpace: 'nowrap',
-      boxSizing: 'border-box',
+    width: drawerWidth, 
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
       ...(open && !isMobile && {
-        ...openedMixin(theme),
-        '& .MuiDrawer-paper': openedMixin(theme),
-      }),
+      ...openedMixin(theme),
+      '& .MuiDrawer-paper': openedMixin(theme),
+    }),
       ...(!open && !isMobile && {
-        ...closedMixin(theme),
-        '& .MuiDrawer-paper': closedMixin(theme),
-      }),
+      ...closedMixin(theme),
+      '& .MuiDrawer-paper': closedMixin(theme),
+    }),
       ...(isMobile && open && {
         ...mobileMixin(theme),
         '& .MuiDrawer-paper': mobileMixin(theme),
-      }),
+  }),
     };
   }
 );

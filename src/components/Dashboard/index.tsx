@@ -34,7 +34,7 @@ const Dashboard = ({ visible }: DashboardProps) => {
       </Paper>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -44,7 +44,7 @@ const Dashboard = ({ visible }: DashboardProps) => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -54,7 +54,7 @@ const Dashboard = ({ visible }: DashboardProps) => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -64,7 +64,7 @@ const Dashboard = ({ visible }: DashboardProps) => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
           <Card>
             <CardContent>
               <Typography color="text.secondary" gutterBottom>
@@ -74,7 +74,7 @@ const Dashboard = ({ visible }: DashboardProps) => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Card>
             <CardContent sx={{ height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Typography variant="body1" color="text.secondary">
@@ -83,7 +83,7 @@ const Dashboard = ({ visible }: DashboardProps) => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent sx={{ height: '250px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Typography variant="body1" color="text.secondary">
@@ -92,7 +92,7 @@ const Dashboard = ({ visible }: DashboardProps) => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent sx={{ height: '250px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Typography variant="body1" color="text.secondary">
