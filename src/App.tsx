@@ -18,7 +18,6 @@ import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import SearchIcon from '@mui/icons-material/Search'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
-import Sidebar from './components/Sidebar'
 import Dashboard from './components/Dashboard'
 import StationModules from './components/StationModules'
 import Appointments from './components/Appointments'
@@ -28,11 +27,20 @@ import AreaManagement from './components/Management/AreaManagement'
 import Settings from './components/Settings'
 import { getDesignTokens } from './theme'
 import './App.css'
+
+// Shared dashboard components
+import { 
+  DashboardContainer, 
+  generateVicsSidebarItems, 
+  generateLawMisSidebarItems, 
+  lawMisFooterLogos, 
+  vicsFooterLogos 
+} from './components/Shared'
+
+// Authentication and role selection components
 import Login from './components/Login/Login'
 import RoleSelection from './components/RoleSelection/RoleSelection'
-import LawMisSelection from './components/LawMisSelection/LawMisSelection'
-import LawMisUserLogin from './components/Login/LawMisUserLogin'
-import LawMisAdminLogin from './components/Login/LawMisAdminLogin'
+import LawMisLogin from './components/Login/LawMisLogin'
 import LawMisUserRegister from './components/Register/LawMisUserRegister'
 import LawMisDashboard from './components/Dashboard/LawMisDashboard'
 import LAW_MISUserProfile from './components/Profile/LAW-MISUserProfile'
@@ -95,32 +103,21 @@ function App() {
   // --- Navigation and Auth Handlers ---
   const handleRoleSelect = (role: SelectedRole) => {
     setSelectedRole(role);
-    setLawMisDashboardType(null);
+    // If LAW-MIS is selected, default to USER login type
+    setLawMisDashboardType(role === 'LAW_MIS' ? 'USER' : null);
     setLawMisUserView('LOGIN');
     setIsLoggedIn(false);
     setLawMisLoggedInAs(null);
     setCurrentLawMisView('DASHBOARD');
   };
 
-  const handleLawMisDashboardSelect = (dashboardType: LawMisDashboardType) => {
-    setLawMisDashboardType(dashboardType);
-    setLawMisUserView('LOGIN');
-    setIsLoggedIn(false);
-    setLawMisLoggedInAs(null);
-    setCurrentLawMisView('DASHBOARD');
-  };
-  
   const handleLoginSuccess = () => {
     if (selectedRole === 'VICS_ADMIN') {
       setIsLoggedIn(true);
     } else if (selectedRole === 'LAW_MIS') {
-       if (lawMisDashboardType === 'USER') {
-           console.log('LAW-MIS User Logged In');
-           setLawMisLoggedInAs('USER');
-       } else if (lawMisDashboardType === 'ADMIN') {
-           console.log('LAW-MIS Admin Logged In');
-           setLawMisLoggedInAs('ADMIN');
-       }
+      // Set the login type based on the selected dashboard type
+      setLawMisLoggedInAs(lawMisDashboardType);
+      console.log(`LAW-MIS ${lawMisDashboardType} Logged In`);
     }
     setCurrentLawMisView('DASHBOARD');
   };
@@ -130,15 +127,6 @@ function App() {
       setSelectedRole(null);
       setIsLoggedIn(false);
       setLawMisDashboardType(null);
-      setLawMisLoggedInAs(null);
-      setLawMisUserView('LOGIN');
-      setCurrentLawMisView('DASHBOARD');
-  };
-
-  // Go back from LAW-MIS Login/Register pages to LAW-MIS Selection
-  const handleGoBackToLawMisSelection = () => {
-      setLawMisDashboardType(null);
-      setIsLoggedIn(false);
       setLawMisLoggedInAs(null);
       setLawMisUserView('LOGIN');
       setCurrentLawMisView('DASHBOARD');
@@ -228,119 +216,128 @@ function App() {
         // Show VICS Login
         return <Login onLoginSuccess={handleLoginSuccess} onGoBack={handleGoBackToRoleSelection} />;
       } else {
-        // Show VICS Main App Layout
+        // Show VICS Main App Layout with shared components
+        const sidebarItems = generateVicsSidebarItems(currentModule, handleModuleSelect);
+        
         return (
-          <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-            <AppBar 
-              position="fixed" 
-              sx={{
-                width: '100%',
-                zIndex: (theme) => theme.zIndex.drawer + 1,
-                bgcolor: theme.palette.secondary.main
-              }}
-            >
-              <Toolbar>
-                <IconButton
-                  color="inherit"
-                  aria-label="toggle drawer"
-                  edge="start"
-                  onClick={handleDrawerToggle}
-                  sx={{ mr: 2 }}
+          <DashboardContainer
+            // Sidebar props
+            sidebarOpen={sidebarOpen}
+            onSidebarToggle={handleDrawerToggle}
+            sidebarItems={sidebarItems}
+            sidebarFooterLogos={vicsFooterLogos}
+            
+            // Navbar props
+            logoSrc="/vite.svg" // Replace with your actual VICS logo path
+            logoAlt="VICS Logo"
+            userInfo={{
+              name: "VICS Admin",
+              email: "admin@vics.com",
+              role: "Administrator"
+            }}
+            onLogout={handleGoBackToRoleSelection}
+            showSearch={true}
+            showNotifications={true}
+          >
+            {/* Main content */}
+            <Box>
+              {currentModule !== 'Dashboard' && (
+                <Breadcrumbs 
+                  separator={<NavigateNextIcon fontSize="small" />}
+                  aria-label="breadcrumb"
+                  sx={{ mb: 2 }}
                 >
-                  <MenuIcon />
-                </IconButton>
-                {isManagementSubmodule ? (
-                  <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb" sx={{ flexGrow: 1, color: 'inherit' }}>
-                    <Link color="inherit" href="#" onClick={(e) => { e.preventDefault(); handleModuleSelect(parentModule); }} sx={{ fontWeight: 'medium' }}>
-                      {parentModule}
-                    </Link>
-                    <Typography color="inherit" sx={{ fontWeight: 'bold' }}>{subModule}</Typography>
-                  </Breadcrumbs>
-                ) : (
-                  <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}> {currentModule} </Typography>
-                )}
-                <IconButton color="inherit" sx={{ mx: 1 }}> <SearchIcon /> </IconButton>
-                <IconButton color="inherit" sx={{ mx: 1 }}> <NotificationsIcon /> </IconButton>
-                <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.secondary.main }}> U </Avatar>
-              </Toolbar>
-            </AppBar>
-            <Box sx={{ display: 'flex' }}>
-            <Sidebar open={sidebarOpen} onToggle={handleDrawerToggle} onModuleSelect={handleModuleSelect} />
-              <Box 
-                component="main" 
-                sx={{ 
-                  flexGrow: 1,
-                  pt: { xs: 8, sm: 9 },
-                  width: { sm: `calc(100% - ${sidebarOpen ? 200 : 50}px)`, xs: '100%' },
-                  transition: (theme) => theme.transitions.create(['width'], {
-                    easing: theme.transitions.easing.sharp,
-                    duration: theme.transitions.duration.enteringScreen,
-                  }),
-                  bgcolor: 'background.default',
-                }}
-              >
-              {renderVicsAppContent()} 
-              </Box>
+                  <Link
+                    color="inherit"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleModuleSelect('Dashboard');
+                    }}
+                  >
+                    Dashboard
+                  </Link>
+                  {isManagementSubmodule ? (
+                    <>
+                      <Link
+                        color="inherit"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Don't navigate, just prevent default
+                        }}
+                      >
+                        {parentModule}
+                      </Link>
+                      <Typography color="text.primary">{subModule}</Typography>
+                    </>
+                  ) : (
+                    <Typography color="text.primary">{currentModule}</Typography>
+                  )}
+                </Breadcrumbs>
+              )}
+              
+              {renderVicsAppContent()}
             </Box>
-          </Box>
+          </DashboardContainer>
         );
       }
     }
 
-    // 3. LAW-MIS Selected?
+    // 3. LAW-MIS Selected? Show login screen directly
     if (selectedRole === 'LAW_MIS') {
-       // Check if a specific LAW-MIS dashboard type is chosen
-       if (!lawMisDashboardType) {
-            return <LawMisSelection onSelectDashboard={handleLawMisDashboardSelect} onGoBack={handleGoBackToRoleSelection} />;
-       }
-       
-       // Check if logged into LAW-MIS portal
-       if (!lawMisLoggedInAs) { 
-           if (lawMisDashboardType === 'USER') {
-               // Check if user is on Login or Register view
-               if (lawMisUserView === 'LOGIN') {
-                  return <LawMisUserLogin 
-                      onLoginSuccess={handleLoginSuccess} 
-                      onGoBack={handleGoBackToLawMisSelection} 
-                      onRegisterClick={handleRegisterClick}
-                   />;
-               } else { // lawMisUserView === 'REGISTER'
-                   return <LawMisUserRegister 
-                       onRegisterSuccess={handleRegisterSuccess}
-                       onGoBack={handleGoBackToLawMisLogin}
-                   />;
-               }
-           } else if (lawMisDashboardType === 'ADMIN') {
-               // LAW-MIS Admin only has login view
-               return <LawMisAdminLogin 
-                   onLoginSuccess={handleLoginSuccess} 
-                   onGoBack={handleGoBackToLawMisSelection} 
-               />;
-           }
-       } else { 
-            // --- Render LAW-MIS Layout (AppBar, Sidebar, Content Area) --- 
-            // This structure is now always rendered when logged into LAW-MIS
-             return <LawMisDashboard 
-                    onLogout={handleGoBackToRoleSelection} 
-                    onNavigateToUserProfile={navigateToLawMisUserProfile}
-                    currentView={currentLawMisView} 
-                    onNavigateBack={navigateToLawMisDashboard} 
-                    onNavigateToChangePassword={navigateToChangePassword}
-                    onNavigateToMap={() => console.warn("Map navigation not implemented yet") }
-                    onNavigateToAddWorkshop={navigateToAddWorkshop}
-                />;
-       }
+      // If not logged in yet
+      if (!lawMisLoggedInAs) {
+        if (lawMisUserView === 'LOGIN') {
+          return <LawMisLogin 
+            onLoginSuccess={handleLoginSuccess} 
+            onGoBack={handleGoBackToRoleSelection}
+            onRegisterClick={handleRegisterClick}
+            dashboardType={lawMisDashboardType}
+            setLoginType={(type) => setLawMisDashboardType(type)}
+          />;
+        } else {
+          return <LawMisUserRegister 
+            onRegisterSuccess={handleRegisterSuccess} 
+            onGoBack={handleGoBackToLawMisLogin}
+          />;
+        }
+      } else {
+        // If logged in, show appropriate dashboard
+        if (lawMisLoggedInAs === 'USER') {
+          // Show LAW-MIS User Dashboard with appropriate content
+          return (
+            <LawMisDashboard 
+              onLogout={handleGoBackToRoleSelection} 
+              currentView={currentLawMisView}
+              onNavigateBack={navigateToLawMisDashboard}
+              onNavigateToChangePassword={navigateToChangePassword}
+              onNavigateToUserProfile={navigateToLawMisUserProfile}
+              onNavigateToMap={() => console.log('Map navigation not implemented')}
+              onNavigateToAddWorkshop={navigateToAddWorkshop}
+            />
+          );
+        } else {
+          // Show LAW-MIS Admin Dashboard (not implemented yet)
+          return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
+              <Typography variant="h4" gutterBottom>LAW-MIS Admin Dashboard</Typography>
+              <Typography variant="body1" gutterBottom>This dashboard is currently under development.</Typography>
+              <Button variant="contained" color="primary" onClick={handleGoBackToRoleSelection}>Logout</Button>
+            </Box>
+          );
+        }
+      }
     }
 
     // Fallback
-    return <Box sx={{p:3}}> <Typography>Unexpected Application State</Typography> </Box>;
+    return <Typography>Unknown state. Please refresh the page.</Typography>;
   };
 
-  // --- Render the application --- 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {renderContent()} 
+      {renderContent()}
     </ThemeProvider>
   );
 }
