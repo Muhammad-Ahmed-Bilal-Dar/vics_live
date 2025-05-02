@@ -337,7 +337,24 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {renderContent()}
+      <Box
+        sx={{
+          width: '100%',
+          height: '100vh',
+          overflow: 'auto',
+          animation: 'appFadeIn 0.5s ease-in-out',
+          '@keyframes appFadeIn': {
+            '0%': {
+              opacity: 0,
+            },
+            '100%': {
+              opacity: 1,
+            },
+          },
+        }}
+      >
+        {renderContent()}
+      </Box>
     </ThemeProvider>
   );
 }

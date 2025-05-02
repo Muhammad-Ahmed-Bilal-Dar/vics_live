@@ -133,6 +133,7 @@ const AutomobileWorkshopDetails: React.FC = () => {
     const [buildingPlan, setBuildingPlan] = useState<File | null>(null);
     const [frontPicture, setFrontPicture] = useState<File | null>(null);
     const [rightPicture, setRightPicture] = useState<File | null>(null);
+    const [workshopVideo, setWorkshopVideo] = useState<File | null>(null);
 
     const handleMobileChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
         if (value.startsWith('03') && /^[0-9]*$/.test(value)) {
@@ -168,6 +169,32 @@ const AutomobileWorkshopDetails: React.FC = () => {
         }
         // Clear the input value so the same file can be selected again if needed
         event.target.value = ''; 
+    };
+    
+    // --- Handle Video File Change with Size Validation ---
+    const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            
+            // Check if it's a video file
+            if (!file.type.startsWith('video/')) {
+                alert('Please select a valid video file');
+                event.target.value = '';
+                return;
+            }
+            
+            // Check file size (10MB = 10 * 1024 * 1024 bytes)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Video file size must be less than 10MB');
+                event.target.value = '';
+                return;
+            }
+            
+            setWorkshopVideo(file);
+        } else {
+            setWorkshopVideo(null);
+        }
+        event.target.value = '';
     };
 
     return (
@@ -479,6 +506,84 @@ const AutomobileWorkshopDetails: React.FC = () => {
                      />
                 </Grid>
             </Grid> {/* End of File Upload Grid container */}
+
+            {/* --- Workshop Video Upload Section --- */}
+            <Grid container spacing={2.5} sx={{ px: 1.5, mt: 3 }}>
+                <Grid item xs={12}>
+                    <Divider sx={{ mb: 2 }} />
+                    <SectionHeader title="WORKSHOP VIDEO" subtitle="ورکشاپ کی ویڈیو" />
+                </Grid>
+                
+                {/* Video Upload Component */}
+                <Grid item xs={12}>
+                    <Box>
+                        <FieldLabel 
+                            primary="ADD 30 SECONDS VIDEO OF THE WORKSHOP" 
+                            secondary="ورکشاپ کی 30 سیکنڈ کی ویڈیو شامل کریں" 
+                        />
+                        <Typography variant="caption" display="block" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
+                            Max File size to be 10MB
+                        </Typography>
+                        <Box
+                            component="label"
+                            htmlFor="workshop-video-upload"
+                            sx={{
+                                border: '2px dashed',
+                                borderColor: 'grey.400',
+                                borderRadius: 1,
+                                p: 3,
+                                textAlign: 'center',
+                                cursor: 'pointer',
+                                display: 'block',
+                                mb: 1,
+                                '&:hover': {
+                                    borderColor: 'primary.main',
+                                    bgcolor: 'action.hover'
+                                }
+                            }}
+                        >
+                            <UploadFileIcon sx={{ fontSize: 40, color: 'grey.500' }} />
+                            <Typography variant="body2" sx={{ fontWeight: 'medium', mt: 1 }}>
+                                CLICK TO SELECT FILES HERE
+                            </Typography>
+                            <Typography variant="caption" display="block" color="text.secondary">
+                                یہاں فائل منتخب کرنے کے لئے کلک کریں
+                            </Typography>
+                            <Typography variant="caption" display="block" color="text.secondary" sx={{ mt: 1, fontSize: '0.65rem' }}>
+                                SELECT FILES FROM YOUR SYSTEM OR SCAN THEM FOR UPLOAD
+                            </Typography>
+                            <Typography variant="caption" display="block" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+                                اپنے سسٹم سے فائلیں منتخب کریں یا انہیں اپ لوڈ کرنے کے لیے اسکین کریں
+                            </Typography>
+                        </Box>
+                        <Input 
+                            id="workshop-video-upload" 
+                            type="file" 
+                            sx={{ display: 'none' }} 
+                            onChange={handleVideoFileChange}
+                            accept="video/*"
+                        />
+                        {workshopVideo && (
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                                    Selected: {workshopVideo.name}
+                                </Typography>
+                                <Box sx={{ mt: 1 }}>
+                                    <video 
+                                        controls 
+                                        width="100%" 
+                                        height="auto" 
+                                        style={{ maxHeight: '200px', borderRadius: '4px' }}
+                                    >
+                                        <source src={URL.createObjectURL(workshopVideo)} type={workshopVideo.type} />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </Box>
+                            </Box>
+                        )}
+                    </Box>
+                </Grid>
+            </Grid>
 
         </Box>
     );

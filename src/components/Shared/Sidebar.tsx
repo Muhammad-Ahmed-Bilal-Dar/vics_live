@@ -37,8 +37,8 @@ export interface SidebarLogo {
 // Define transition mixins
 const openedMixin = (theme: Theme, drawerWidth: number): CSSObject => ({
     width: drawerWidth,
-    transition: theme.transitions.create('width', {
-        easing: theme.transitions.easing.sharp,
+    transition: theme.transitions.create(['width', 'background-color'], {
+        easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
     }),
     overflowX: 'hidden',
@@ -56,7 +56,7 @@ const openedMixin = (theme: Theme, drawerWidth: number): CSSObject => ({
 });
 
 const closedMixin = (theme: Theme, closedWidth: number): CSSObject => ({
-    transition: theme.transitions.create('width', {
+    transition: theme.transitions.create(['width', 'background-color'], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
     }),
@@ -185,6 +185,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                             pl: open ? 2 + paddingLeft : 2,
                             justifyContent: open ? 'initial' : 'center',
                             backgroundColor: item.selected ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                            transition: theme => theme.transitions.create(['background-color', 'padding', 'min-height'], {
+                                easing: theme.transitions.easing.easeInOut,
+                                duration: theme.transitions.duration.shorter,
+                            }),
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                            },
                         }}
                     >
                         <ListItemIcon
@@ -192,7 +199,22 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 minWidth: 0,
                                 mr: open ? theme.sidebar?.iconMargin || 2 : 'auto',
                                 justifyContent: 'center',
-                                color: 'inherit'
+                                color: 'inherit',
+                                transition: theme => theme.transitions.create(['margin-right', 'transform'], {
+                                    easing: theme.transitions.easing.easeInOut,
+                                    duration: theme.transitions.duration.standard,
+                                }),
+                                animation: open ? 'none' : 'spin 0.4s ease-out',
+                                '@keyframes spin': {
+                                    '0%': {
+                                        transform: 'rotate(-180deg)',
+                                        opacity: 0.3,
+                                    },
+                                    '100%': {
+                                        transform: 'rotate(0deg)',
+                                        opacity: 1,
+                                    },
+                                },
                             }}
                         >
                             {item.icon}
@@ -201,8 +223,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                             primary={item.label} 
                             sx={{ 
                                 opacity: open ? 1 : 0,
-                                m: 0
-                            }} 
+                                m: 0,
+                                transition: theme => theme.transitions.create(['opacity', 'transform'], {
+                                    easing: theme.transitions.easing.easeInOut,
+                                    duration: theme.transitions.duration.standard,
+                                    delay: open ? '0.1s' : '0s',
+                                }),
+                                transform: open ? 'translateX(0)' : 'translateX(10px)',
+                            }}
                             primaryTypographyProps={{ 
                                 variant: level === 0 ? 'sidebarMenuItem' : 'sidebarSubMenuItem',
                                 sx: {
@@ -255,8 +283,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                         alignItems: 'center', 
                         backgroundColor: 'rgba(255, 255, 255, 0.1)', 
                         opacity: open ? 1 : 0, 
-                        transition: theme.transitions.create('opacity', {
-                            duration: theme.transitions.duration.leavingScreen
+                        transition: theme => theme.transitions.create(['opacity', 'padding'], {
+                            easing: theme.transitions.easing.easeInOut,
+                            duration: theme.transitions.duration.standard,
                         }),
                         overflow: 'hidden', 
                         minHeight: 50, 
@@ -267,7 +296,23 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 component="img" 
                                 src={logo.src} 
                                 alt={logo.alt} 
-                                sx={{ height: 30, width: 'auto', objectFit: 'contain', display: open ? 'block' : 'none' }}
+                                sx={{ 
+                                    height: 30, 
+                                    width: 'auto', 
+                                    objectFit: 'contain', 
+                                    display: open ? 'block' : 'none',
+                                    animation: open ? 'fadeInLogo 0.6s ease-out' : 'none',
+                                    '@keyframes fadeInLogo': {
+                                        '0%': {
+                                            opacity: 0,
+                                            transform: 'scale(0.5)'
+                                        },
+                                        '100%': {
+                                            opacity: 1,
+                                            transform: 'scale(1)'
+                                        }
+                                    }
+                                }}
                             />
                         ))}
                     </Box>

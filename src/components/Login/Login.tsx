@@ -47,7 +47,16 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoBack }) => {
         backgroundSize: 'cover', // Cover the entire area
         backgroundPosition: 'center', // Center the image
         backgroundRepeat: 'no-repeat', // Don't repeat the image
-        // bgcolor: 'grey.100' // Remove or comment out the plain background color
+        // Animation for the background
+        animation: 'fadeIn 0.8s ease-in-out',
+        '@keyframes fadeIn': {
+          '0%': {
+            opacity: 0,
+          },
+          '100%': {
+            opacity: 1,
+          },
+        },
       }}
     >
       <Paper 
@@ -59,7 +68,19 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess, onGoBack }) => {
           alignItems: 'center',
           maxWidth: 400, // Limit form width
           width: '100%',
-          borderRadius: 2 // Slightly rounded corners
+          borderRadius: 2, // Slightly rounded corners
+          // Animation for the login form
+          animation: 'slideUp 0.6s ease-out 0.3s both',
+          '@keyframes slideUp': {
+            '0%': {
+              transform: 'translateY(30px)',
+              opacity: 0
+            },
+            '100%': {
+              transform: 'translateY(0)',
+              opacity: 1
+            }
+          }
         }}
       >
         <LockOutlinedIcon sx={{ fontSize: 40, color: 'primary.main', mb: 2 }} />

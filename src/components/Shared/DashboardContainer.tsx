@@ -84,10 +84,10 @@ const DashboardContainer: React.FC<DashboardContainerProps> = ({
                 sx={{
                     flexGrow: 1,
                     p: 3,
-                    marginLeft: {
-                        sm: sidebarOpen ? `${drawerWidth}px` : `${closedDrawerWidth}px`,
-                        xs: 0
-                    },
+                    // marginLeft: {
+                    //     sm: sidebarOpen ? `${drawerWidth}px` : `${closedDrawerWidth}px`,
+                    //     xs: 0
+                    // },
                     width: {
                         sm: `calc(100% - ${sidebarOpen ? drawerWidth : closedDrawerWidth}px)`,
                         xs: '100%'
@@ -98,6 +98,8 @@ const DashboardContainer: React.FC<DashboardContainerProps> = ({
                             ? theme.transitions.duration.enteringScreen 
                             : theme.transitions.duration.leavingScreen,
                     }),
+                    overflow: 'auto',
+                    maxHeight: '100vh',
                 }}
             >
                 {/* Spacer for the AppBar */}
