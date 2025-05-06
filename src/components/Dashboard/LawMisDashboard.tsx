@@ -63,7 +63,7 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
   console.log(`LawMisDashboard rendering view: ${currentView}`); 
   const theme = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false); 
   
   // Handlers
   const handleDrawerToggle = () => {
@@ -75,12 +75,12 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
   };
   
   const handleCloseConfirmDialog = () => {
-    setConfirmLogoutOpen(false);
+      setConfirmLogoutOpen(false);
   };
   
   const handleConfirmLogout = () => {
-    console.log("Logout confirmed");
-    onLogout(); 
+      console.log("Logout confirmed");
+      onLogout(); 
     handleCloseConfirmDialog();
   };
 
@@ -113,24 +113,24 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
   // --- Dashboard-specific content --- 
   const renderDashboardContent = () => (
     <>
-      {/* Header Row */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-           WORKSHOPS LIST 
-        </Typography>
-        <Button
-            variant="contained"
-            color="primary" 
-            startIcon={<AddIcon />}
-            onClick={handleAddNewWorkshop}
-        >
-            Add New Workshop
-        </Button>
-      </Box>
+       {/* Header Row */}
+       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+             WORKSHOPS LIST 
+          </Typography>
+          <Button
+              variant="contained"
+              color="primary" 
+              startIcon={<AddIcon />}
+              onClick={handleAddNewWorkshop}
+          >
+              Add New Workshop
+          </Button>
+       </Box>
 
       {/* Summary Cards - Using modern Grid syntax */}
       <Box sx={{ display: 'flex', gap: 3, overflowX: 'auto', mt: 1, py: 1 }}>
-        {summaryData.map((item, index) => (
+          {summaryData.map((item, index) => (
           <Box key={index} sx={{ minWidth: 200, flex: 1 }}>
             <Paper 
               elevation={3} 
@@ -139,22 +139,22 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
                 backgroundColor: item.bgColor
               }}
             >
-              <Box>
+                       <Box>
                 <Typography variant="subtitle1" sx={{ color: 'inherit', fontWeight: 'bold' }}>{item.title}</Typography>
-                <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{item.count}</Typography>
-              </Box>
+                          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{item.count}</Typography>
+                       </Box>
               <IconButton sx={{ color: 'inherit', backgroundColor: 'rgba(255, 255, 255, 0.2)', borderRadius: '50%' }}>
-                {React.cloneElement(item.icon, { sx: { fontSize: 32 } })}
-              </IconButton>
-            </Paper>
+                          {React.cloneElement(item.icon, { sx: { fontSize: 32 } })}
+                       </IconButton>
+                  </Paper>
           </Box>
-        ))}
+          ))}
       </Box>
 
-      {/* Placeholder for the main content area */}
-      <Paper sx={{ mt: 3, p: 2, minHeight: '400px', width: '100%' }}>
-        <Typography variant="body1">Workshop list table or other content will go here...</Typography>
-      </Paper>
+       {/* Placeholder for the main content area */}
+       <Paper sx={{ mt: 3, p: 2, minHeight: '400px', width: '100%' }}>
+          <Typography variant="body1">Workshop list table or other content will go here...</Typography>
+       </Paper>
     </>
   );
 
@@ -201,29 +201,29 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
           {renderContent()}
         </Container>
       </DashboardContainer>
-      
-      {/* Logout Confirmation Dialog */}
-      <Dialog
-        open={confirmLogoutOpen}
+       
+       {/* Logout Confirmation Dialog */}
+       <Dialog
+            open={confirmLogoutOpen}
         onClose={handleCloseConfirmDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Confirm Logout"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to logout?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseConfirmDialog}>Cancel</Button>
-          <Button onClick={handleConfirmLogout} color="primary" autoFocus>
-            Logout
-          </Button>
-        </DialogActions>
-      </Dialog>
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">
+                {"Confirm Logout"}
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    Are you sure you want to logout?
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleCloseConfirmDialog}>Cancel</Button>
+                <Button onClick={handleConfirmLogout} color="primary" autoFocus>
+                    Logout
+                </Button>
+            </DialogActions>
+        </Dialog>
     </>
   );
 };

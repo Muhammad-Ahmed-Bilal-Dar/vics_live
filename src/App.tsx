@@ -110,7 +110,7 @@ function App() {
     setLawMisLoggedInAs(null);
     setCurrentLawMisView('DASHBOARD');
   };
-
+  
   const handleLoginSuccess = () => {
     if (selectedRole === 'VICS_ADMIN') {
       setIsLoggedIn(true);
@@ -257,7 +257,7 @@ function App() {
                   >
                     Dashboard
                   </Link>
-                  {isManagementSubmodule ? (
+                {isManagementSubmodule ? (
                     <>
                       <Link
                         color="inherit"
@@ -267,17 +267,17 @@ function App() {
                           // Don't navigate, just prevent default
                         }}
                       >
-                        {parentModule}
-                      </Link>
+                      {parentModule}
+                    </Link>
                       <Typography color="text.primary">{subModule}</Typography>
                     </>
                   ) : (
                     <Typography color="text.primary">{currentModule}</Typography>
                   )}
-                </Breadcrumbs>
+                  </Breadcrumbs>
               )}
               
-              {renderVicsAppContent()}
+              {renderVicsAppContent()} 
             </Box>
           </DashboardContainer>
         );
@@ -287,34 +287,34 @@ function App() {
     // 3. LAW-MIS Selected? Show login screen directly
     if (selectedRole === 'LAW_MIS') {
       // If not logged in yet
-      if (!lawMisLoggedInAs) {
-        if (lawMisUserView === 'LOGIN') {
+       if (!lawMisLoggedInAs) { 
+               if (lawMisUserView === 'LOGIN') {
           return <LawMisLogin 
-            onLoginSuccess={handleLoginSuccess} 
+                      onLoginSuccess={handleLoginSuccess} 
             onGoBack={handleGoBackToRoleSelection}
-            onRegisterClick={handleRegisterClick}
+                      onRegisterClick={handleRegisterClick}
             dashboardType={lawMisDashboardType}
             setLoginType={(type) => setLawMisDashboardType(type)}
-          />;
+                   />;
         } else {
-          return <LawMisUserRegister 
-            onRegisterSuccess={handleRegisterSuccess} 
-            onGoBack={handleGoBackToLawMisLogin}
-          />;
-        }
-      } else {
+                   return <LawMisUserRegister 
+                       onRegisterSuccess={handleRegisterSuccess}
+                       onGoBack={handleGoBackToLawMisLogin}
+               />;
+           }
+       } else { 
         // If logged in, show appropriate dashboard
         if (lawMisLoggedInAs === 'USER') {
           // Show LAW-MIS User Dashboard with appropriate content
           return (
             <LawMisDashboard 
-              onLogout={handleGoBackToRoleSelection} 
-              currentView={currentLawMisView}
-              onNavigateBack={navigateToLawMisDashboard}
-              onNavigateToChangePassword={navigateToChangePassword}
+                    onLogout={handleGoBackToRoleSelection} 
+                    currentView={currentLawMisView} 
+                    onNavigateBack={navigateToLawMisDashboard} 
+                    onNavigateToChangePassword={navigateToChangePassword}
               onNavigateToUserProfile={navigateToLawMisUserProfile}
               onNavigateToMap={() => console.log('Map navigation not implemented')}
-              onNavigateToAddWorkshop={navigateToAddWorkshop}
+                    onNavigateToAddWorkshop={navigateToAddWorkshop}
             />
           );
         } else {
@@ -327,7 +327,7 @@ function App() {
             </Box>
           );
         }
-      }
+       }
     }
 
     // Fallback
@@ -353,7 +353,7 @@ function App() {
           },
         }}
       >
-        {renderContent()}
+      {renderContent()} 
       </Box>
     </ThemeProvider>
   );

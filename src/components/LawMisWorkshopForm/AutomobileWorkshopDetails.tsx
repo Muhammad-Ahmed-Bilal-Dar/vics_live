@@ -194,7 +194,7 @@ const AutomobileWorkshopDetails: React.FC = () => {
         } else {
             setWorkshopVideo(null);
         }
-        event.target.value = '';
+        event.target.value = ''; 
     };
 
     return (
