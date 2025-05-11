@@ -19,6 +19,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ListIcon from '@mui/icons-material/List';
 import MailIcon from '@mui/icons-material/Mail';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 
 // Logos for footer
 import PtaLogo from '../../assets/images/PTA-logo.png';
@@ -171,6 +172,13 @@ export const generateLawMisSidebarItems = (
             icon: <MailIcon fontSize="small" />,
             onClick: () => console.log('Workshop List clicked'),
             selected: false
+        },
+        {
+            id: 'AddSupplier',
+            label: 'Add Supplier',
+            icon: <LocalShippingIcon fontSize="small" />,
+            onClick: () => onNavigateToView('ADD_SUPPLIER'),
+            selected: currentView === 'ADD_SUPPLIER'
         }
     ];
 };

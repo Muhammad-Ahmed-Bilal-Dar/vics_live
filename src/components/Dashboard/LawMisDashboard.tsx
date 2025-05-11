@@ -22,6 +22,7 @@ import LawMisLogo from '../../assets/LAW-MIS-logo.svg';
 import LAW_MISUserProfile from '../Profile/LAW-MISUserProfile'; 
 import LAW_MISChangePassword from '../Profile/LAW-MISChangePassword'; 
 import LawMisAddWorkshopForm from '../LawMisWorkshopForm/LawMisAddWorkshopForm';
+import LawMisAddSupplierForm from '../LawMisWorkshopForm/LawMisAddSupplierForm';
 
 // Import shared dashboard components
 import { DashboardContainer, generateLawMisSidebarItems, lawMisFooterLogos } from '../Shared';
@@ -38,7 +39,7 @@ const cardStyles = {
 };
 
 // --- Component Props --- Define types for props
-type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP';
+type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP' | 'ADD_SUPPLIER';
 
 interface LawMisDashboardProps {
     onLogout: () => void; 
@@ -48,6 +49,7 @@ interface LawMisDashboardProps {
     onNavigateToUserProfile: () => void;
     onNavigateToMap: () => void;
     onNavigateToAddWorkshop: () => void;
+    onNavigateToAddSupplier: () => void;
 }
 
 // --- Dashboard Component --- 
@@ -59,6 +61,7 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
     onNavigateToUserProfile,
     onNavigateToMap,
     onNavigateToAddWorkshop,
+    onNavigateToAddSupplier,
 }) => { 
   console.log(`LawMisDashboard rendering view: ${currentView}`); 
   const theme = useTheme();
@@ -106,6 +109,8 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
         onNavigateToUserProfile();
       } else if (view === 'CHANGE_PASSWORD') {
         onNavigateToChangePassword();
+      } else if (view === 'ADD_SUPPLIER') {
+        onNavigateToAddSupplier();
       }
     }
   );
@@ -169,6 +174,8 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
         return <LAW_MISChangePassword onGoBack={onNavigateBack} />;
       case 'ADD_WORKSHOP':
         return <LawMisAddWorkshopForm onNavigateBack={onNavigateBack} />;
+      case 'ADD_SUPPLIER':
+        return <LawMisAddSupplierForm onNavigateBack={onNavigateBack} />;
       default:
         return <Typography>Unknown view</Typography>;
     }

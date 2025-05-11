@@ -68,7 +68,7 @@ const getContentWidth = (open: boolean, drawerWidth: number) => {
 type SelectedRole = 'VICS_ADMIN' | 'LAW_MIS' | null;
 type LawMisDashboardType = 'USER' | 'ADMIN' | null;
 type LawMisUserView = 'LOGIN' | 'REGISTER';
-type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP';
+type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP' | 'ADD_SUPPLIER';
 
 function App() {
   const drawerWidth = 200;
@@ -160,6 +160,10 @@ function App() {
 
   const navigateToAddWorkshop = () => {
       setCurrentLawMisView('ADD_WORKSHOP');
+  };
+
+  const navigateToAddSupplier = () => {
+      setCurrentLawMisView('ADD_SUPPLIER');
   };
 
   // --- VICS App Content Rendering --- (Keep this separate for clarity)
@@ -315,6 +319,7 @@ function App() {
               onNavigateToUserProfile={navigateToLawMisUserProfile}
               onNavigateToMap={() => console.log('Map navigation not implemented')}
                     onNavigateToAddWorkshop={navigateToAddWorkshop}
+                    onNavigateToAddSupplier={navigateToAddSupplier}
             />
           );
         } else {
