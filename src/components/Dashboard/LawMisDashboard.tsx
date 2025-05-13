@@ -11,8 +11,16 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Container
+    Container,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Chip
 } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search'; 
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'; 
@@ -22,7 +30,12 @@ import LawMisLogo from '../../assets/LAW-MIS-logo.svg';
 import LAW_MISUserProfile from '../Profile/LAW-MISUserProfile'; 
 import LAW_MISChangePassword from '../Profile/LAW-MISChangePassword'; 
 import LawMisAddWorkshopForm from '../LawMisWorkshopForm/LawMisAddWorkshopForm';
-import LawMisAddSupplierForm from '../LawMisWorkshopForm/LawMisAddSupplierForm';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PersonIcon from '@mui/icons-material/Person';
+import PhoneIcon from '@mui/icons-material/Phone';
+import EmailIcon from '@mui/icons-material/Email';
+import StarIcon from '@mui/icons-material/Star';
 
 // Import shared dashboard components
 import { DashboardContainer, generateLawMisSidebarItems, lawMisFooterLogos } from '../Shared';
@@ -39,7 +52,7 @@ const cardStyles = {
 };
 
 // --- Component Props --- Define types for props
-type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP' | 'ADD_SUPPLIER';
+type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP';
 
 interface LawMisDashboardProps {
     onLogout: () => void; 
@@ -49,7 +62,19 @@ interface LawMisDashboardProps {
     onNavigateToUserProfile: () => void;
     onNavigateToMap: () => void;
     onNavigateToAddWorkshop: () => void;
-    onNavigateToAddSupplier: () => void;
+}
+
+// Add interface for workshop data
+interface Workshop {
+    id: string;
+    name: string;
+    location: string;
+    contactPerson: string;
+    phoneNumber: string;
+    email: string;
+    status: 'active' | 'inactive';
+    lastInspection: string;
+    rating: number;
 }
 
 // --- Dashboard Component --- 
@@ -61,7 +86,6 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
     onNavigateToUserProfile,
     onNavigateToMap,
     onNavigateToAddWorkshop,
-    onNavigateToAddSupplier,
 }) => { 
   console.log(`LawMisDashboard rendering view: ${currentView}`); 
   const theme = useTheme();
@@ -100,6 +124,32 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
     { title: 'INSPECTION PASSED', count: 0, icon: <CheckCircleOutlineIcon sx={{ fontSize: 40 }} />, bgColor: theme.palette.dashboardCard.inspectionPassed }, 
   ];
 
+  // Add dummy workshop data
+  const workshops: Workshop[] = [
+    {
+        id: 'WS001',
+        name: 'AutoCare Workshop',
+        location: 'Gulberg, Lahore',
+        contactPerson: 'Ahmed Khan',
+        phoneNumber: '0300-1234567',
+        email: 'ahmed@autocare.com',
+        status: 'active',
+        lastInspection: '2024-03-15',
+        rating: 4.5
+    },
+    {
+        id: 'WS002',
+        name: 'City Motors Service',
+        location: 'Defence, Lahore',
+        contactPerson: 'Sara Malik',
+        phoneNumber: '0300-7654321',
+        email: 'sara@citymotors.com',
+        status: 'active',
+        lastInspection: '2024-03-10',
+        rating: 4.2
+    }
+  ];
+
   // Generate sidebar items for LAW-MIS
   const sidebarItems = generateLawMisSidebarItems(
     currentView,
@@ -109,8 +159,6 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
         onNavigateToUserProfile();
       } else if (view === 'CHANGE_PASSWORD') {
         onNavigateToChangePassword();
-      } else if (view === 'ADD_SUPPLIER') {
-        onNavigateToAddSupplier();
       }
     }
   );
@@ -123,14 +171,25 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
           <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
              WORKSHOPS LIST 
           </Typography>
-          <Button
-              variant="contained"
-              color="primary" 
-              startIcon={<AddIcon />}
-              onClick={handleAddNewWorkshop}
-          >
-              Add New Workshop
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<ListAltIcon />}
+              sx={{ fontWeight: 'bold', borderRadius: 2 }}
+            >
+              Stations List
+            </Button>
+            <Button
+                variant="contained"
+                color="primary" 
+                startIcon={<AddIcon />}
+                onClick={handleAddNewWorkshop}
+                sx={{ fontWeight: 'bold', borderRadius: 2 }}
+            >
+                Add New Workshop
+            </Button>
+          </Box>
        </Box>
 
       {/* Summary Cards - Using modern Grid syntax */}
@@ -156,10 +215,75 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
           ))}
       </Box>
 
-       {/* Placeholder for the main content area */}
-       <Paper sx={{ mt: 3, p: 2, minHeight: '400px', width: '100%' }}>
-          <Typography variant="body1">Workshop list table or other content will go here...</Typography>
-       </Paper>
+      {/* Workshop Cards Grid */}
+      <Box sx={{ mt: 4 }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
+            gap: 3,
+          }}
+        >
+          {workshops.map((workshop) => (
+            <Paper
+              key={workshop.id}
+              elevation={4}
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                transition: 'box-shadow 0.2s',
+                '&:hover': { boxShadow: 8 },
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                minHeight: 260,
+                background: 'linear-gradient(135deg, #f8fafc 60%, #e3f2fd 100%)',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', flexGrow: 1 }}>
+                  {workshop.name}
+                </Typography>
+                <Chip
+                  label={workshop.status.toUpperCase()}
+                  color={workshop.status === 'active' ? 'success' : 'error'}
+                  size="small"
+                  sx={{ fontWeight: 'bold' }}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                <LocationOnIcon color="primary" fontSize="small" />
+                <Typography variant="body2" color="text.secondary">
+                  {workshop.location}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                <PersonIcon color="action" fontSize="small" />
+                <Typography variant="body2">{workshop.contactPerson}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                <PhoneIcon color="action" fontSize="small" />
+                <Typography variant="body2">{workshop.phoneNumber}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                <EmailIcon color="action" fontSize="small" />
+                <Typography variant="body2">{workshop.email}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                <StarIcon sx={{ color: '#fbc02d' }} fontSize="small" />
+                <Typography variant="body2" sx={{ fontWeight: 'bold', mr: 0.5 }}>{workshop.rating}</Typography>
+                <Typography variant="body2" color="text.secondary">/5</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  Last Inspection:
+                </Typography>
+                <Typography variant="caption" sx={{ fontWeight: 'bold' }}>{workshop.lastInspection}</Typography>
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+      </Box>
     </>
   );
 
@@ -174,64 +298,51 @@ const LawMisDashboard: React.FC<LawMisDashboardProps> = ({
         return <LAW_MISChangePassword onGoBack={onNavigateBack} />;
       case 'ADD_WORKSHOP':
         return <LawMisAddWorkshopForm onNavigateBack={onNavigateBack} />;
-      case 'ADD_SUPPLIER':
-        return <LawMisAddSupplierForm onNavigateBack={onNavigateBack} />;
       default:
         return <Typography>Unknown view</Typography>;
     }
   };
 
-  // --- Main Render --- 
   return (
-    <>
-      <DashboardContainer
-        // Sidebar props
-        sidebarOpen={drawerOpen}
-        onSidebarToggle={handleDrawerToggle}
-        sidebarItems={sidebarItems}
-        sidebarFooterLogos={lawMisFooterLogos}
-        
-        // Navbar props
-        logoSrc={LawMisLogo}
-        logoAlt="LAW-MIS Logo"
-        userInfo={{
-          name: "Muhammad Ahmed Bilal Dar",
-          email: "mahmeddar2000@gmail.com",
-          role: "Workshop User"
-        }}
-        onLogout={handleLogoutClick}
-        onNavigateToProfile={onNavigateToUserProfile}
-        onNavigateToChangePassword={onNavigateToChangePassword}
-      >
-        {/* Main content */}
-        <Container maxWidth="xl" sx={{ p: 0 }}>
-          {renderContent()}
-        </Container>
-      </DashboardContainer>
-       
-       {/* Logout Confirmation Dialog */}
-       <Dialog
-            open={confirmLogoutOpen}
+    <DashboardContainer
+      sidebarOpen={drawerOpen}
+      onSidebarToggle={handleDrawerToggle}
+      sidebarItems={sidebarItems}
+      sidebarFooterLogos={lawMisFooterLogos}
+      logoSrc={LawMisLogo}
+      logoAlt="LAW-MIS Logo"
+      userInfo={{
+        name: "Muhammad Ahmed Bilal Dar",
+        email: "mahmeddar2000@gmail.com",
+        role: "Workshop User"
+      }}
+      onLogout={handleLogoutClick}
+      onNavigateToProfile={onNavigateToUserProfile}
+      onNavigateToChangePassword={onNavigateToChangePassword}
+    >
+      <Container maxWidth="xl" sx={{ p: 0 }}>
+        {renderContent()}
+      </Container>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog
+        open={confirmLogoutOpen}
         onClose={handleCloseConfirmDialog}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-            <DialogTitle id="alert-dialog-title">
-                {"Confirm Logout"}
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                    Are you sure you want to logout?
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleCloseConfirmDialog}>Cancel</Button>
-                <Button onClick={handleConfirmLogout} color="primary" autoFocus>
-                    Logout
-                </Button>
-            </DialogActions>
-        </Dialog>
-    </>
+      >
+        <DialogTitle>Confirm Logout</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to logout?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmDialog}>Cancel</Button>
+          <Button onClick={handleConfirmLogout} color="primary" autoFocus>
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </DashboardContainer>
   );
 };
 

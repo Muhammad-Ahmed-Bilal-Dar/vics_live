@@ -162,10 +162,6 @@ function App() {
       setCurrentLawMisView('ADD_WORKSHOP');
   };
 
-  const navigateToAddSupplier = () => {
-      setCurrentLawMisView('ADD_SUPPLIER');
-  };
-
   // --- VICS App Content Rendering --- (Keep this separate for clarity)
   const renderVicsAppContent = () => {
     if (currentModule === 'Dashboard') {
@@ -319,7 +315,6 @@ function App() {
               onNavigateToUserProfile={navigateToLawMisUserProfile}
               onNavigateToMap={() => console.log('Map navigation not implemented')}
                     onNavigateToAddWorkshop={navigateToAddWorkshop}
-                    onNavigateToAddSupplier={navigateToAddSupplier}
             />
           );
         } else {

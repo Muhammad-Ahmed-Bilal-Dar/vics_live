@@ -13,6 +13,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import EvStationIcon from '@mui/icons-material/EvStation';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LockIcon from '@mui/icons-material/Lock';
 
 // Icons for LAW-MIS sidebar
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -125,60 +126,13 @@ export const generateLawMisSidebarItems = (
     onNavigateBack: () => void,
     onNavigateToView: (view: string) => void
 ): SidebarItem[] => {
-    // Initial state for the listings submenu
-    const listingsExpanded = true;
-    
     return [
         {
             id: 'Dashboard',
             label: 'Dashboard',
-            icon: <InboxIcon fontSize="small" />,
+            icon: <DashboardIcon fontSize="small" />,
             onClick: () => onNavigateBack(),
             selected: currentView === 'DASHBOARD'
-        },
-        {
-            id: 'UserProfile',
-            label: 'User Profile',
-            icon: <AccountCircleIcon fontSize="small" />,
-            onClick: () => onNavigateToView('PROFILE'),
-            selected: currentView === 'PROFILE'
-        },
-        {
-            id: 'Listings',
-            label: 'Listings',
-            icon: <ListIcon fontSize="small" />,
-            onClick: () => {},
-            selected: false,
-            subItems: [
-                {
-                    id: 'SubItem1',
-                    label: 'Sub Item 1',
-                    icon: <InboxIcon fontSize="small" />,
-                    onClick: () => console.log('SubItem1 clicked'),
-                    selected: false
-                },
-                {
-                    id: 'SubItem2',
-                    label: 'Sub Item 2',
-                    icon: <InboxIcon fontSize="small" />,
-                    onClick: () => console.log('SubItem2 clicked'),
-                    selected: false
-                }
-            ]
-        },
-        {
-            id: 'WorkshopList',
-            label: 'Workshop List',
-            icon: <MailIcon fontSize="small" />,
-            onClick: () => console.log('Workshop List clicked'),
-            selected: false
-        },
-        {
-            id: 'AddSupplier',
-            label: 'Add Supplier',
-            icon: <LocalShippingIcon fontSize="small" />,
-            onClick: () => onNavigateToView('ADD_SUPPLIER'),
-            selected: currentView === 'ADD_SUPPLIER'
         }
     ];
 };
@@ -190,4 +144,4 @@ export const lawMisFooterLogos: SidebarLogo[] = [
     { src: TransportLogo, alt: 'Transport Logo' }
 ];
 
-export const vicsFooterLogos: SidebarLogo[] = [];  // No footer logos for VICS 
+export const vicsFooterLogos: SidebarLogo[] = [];  // No footer logos for VICS  
