@@ -21,6 +21,9 @@ import ListIcon from '@mui/icons-material/List';
 import MailIcon from '@mui/icons-material/Mail';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import BusinessIcon from '@mui/icons-material/Business';
 
 // Logos for footer
 import PtaLogo from '../../assets/images/PTA-logo.png';
@@ -133,6 +136,58 @@ export const generateLawMisSidebarItems = (
             icon: <DashboardIcon fontSize="small" />,
             onClick: () => onNavigateBack(),
             selected: currentView === 'DASHBOARD'
+        }
+    ];
+};
+
+// Vendor Sidebar Items Generator
+export const generateVendorSidebarItems = (
+    currentView: string,
+    onNavigateBack: () => void,
+    onNavigateToView: (view: string) => void
+): SidebarItem[] => {
+    return [
+        {
+            id: 'Dashboard',
+            label: 'Dashboard',
+            icon: <DashboardIcon fontSize="small" />,
+            onClick: () => onNavigateBack(),
+            selected: currentView === 'DASHBOARD'
+        },
+        {
+            id: 'Products',
+            label: 'Manage Products',
+            icon: <InventoryIcon fontSize="small" />,
+            onClick: () => onNavigateToView('MANAGE_PRODUCTS'),
+            selected: currentView === 'MANAGE_PRODUCTS'
+        },
+        {
+            id: 'Orders',
+            label: 'View Orders',
+            icon: <ShoppingCartIcon fontSize="small" />,
+            onClick: () => onNavigateToView('VIEW_ORDERS'),
+            selected: currentView === 'VIEW_ORDERS'
+        },
+        {
+            id: 'BecomeVendor',
+            label: 'Vendor Registration',
+            icon: <BusinessIcon fontSize="small" />,
+            onClick: () => onNavigateToView('BECOME_VENDOR'),
+            selected: currentView === 'BECOME_VENDOR'
+        },
+        {
+            id: 'Profile',
+            label: 'Profile',
+            icon: <AccountCircleIcon fontSize="small" />,
+            onClick: () => onNavigateToView('PROFILE'),
+            selected: currentView === 'PROFILE'
+        },
+        {
+            id: 'ChangePassword',
+            label: 'Change Password',
+            icon: <LockIcon fontSize="small" />,
+            onClick: () => onNavigateToView('CHANGE_PASSWORD'),
+            selected: currentView === 'CHANGE_PASSWORD'
         }
     ];
 };

@@ -52,7 +52,7 @@ const cardStyles = {
 };
 
 // --- Component Props --- Define types for props
-type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP';
+type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP' | 'ADD_SUPPLIER';
 
 interface LawMisDashboardProps {
     onLogout: () => void; 

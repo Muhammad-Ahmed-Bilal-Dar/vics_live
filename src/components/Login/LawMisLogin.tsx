@@ -19,14 +19,15 @@ import {
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import BusinessIcon from '@mui/icons-material/Business';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface LawMisLoginProps {
   onLoginSuccess: () => void;
   onGoBack: () => void;
   onRegisterClick: () => void;
-  dashboardType: 'USER' | 'ADMIN' | null;
-  setLoginType: (type: 'USER' | 'ADMIN') => void;
+  dashboardType: 'USER' | 'ADMIN' | 'VENDOR' | null;
+  setLoginType: (type: 'USER' | 'ADMIN' | 'VENDOR') => void;
 }
 
 const LawMisLogin: React.FC<LawMisLoginProps> = ({
@@ -40,12 +41,12 @@ const LawMisLogin: React.FC<LawMisLoginProps> = ({
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loginAs, setLoginAs] = useState<'USER' | 'ADMIN'>(dashboardType || 'USER');
+  const [loginAs, setLoginAs] = useState<'USER' | 'ADMIN' | 'VENDOR'>(dashboardType || 'USER');
 
   // Handle login type change
   const handleLoginTypeChange = (event: SelectChangeEvent) => {
-    setLoginAs(event.target.value as 'USER' | 'ADMIN');
-    setLoginType(event.target.value as 'USER' | 'ADMIN');
+    setLoginAs(event.target.value as 'USER' | 'ADMIN' | 'VENDOR');
+    setLoginType(event.target.value as 'USER' | 'ADMIN' | 'VENDOR');
     // Reset form when changing login type
     setUsername('');
     setPassword('');
@@ -65,7 +66,7 @@ const LawMisLogin: React.FC<LawMisLoginProps> = ({
       } else {
         setError('Invalid Username or Password');
       }
-    } else {
+    } else if (loginAs === 'ADMIN') {
       // Handle admin login with the specified credentials
       if (username === 'adm' && password === 'adm') {
         console.log('LAW-MIS Admin login successful');
@@ -73,24 +74,34 @@ const LawMisLogin: React.FC<LawMisLoginProps> = ({
       } else {
         setError('Invalid Admin Username or Password');
       }
+    } else if (loginAs === 'VENDOR') {
+      // Handle vendor login with the specified credentials
+      if (username === 'vendor' && password === 'vendor') {
+        console.log('LAW-MIS Vendor login successful');
+        onLoginSuccess();
+      } else {
+        setError('Invalid Vendor Username or Password');
+      }
     }
   };
 
   // Determine UI elements based on login type
   const getLoginTypeColor = () => {
-    return loginAs === 'ADMIN' ? 'success' : 'primary';
+    if (loginAs === 'ADMIN') return 'success';
+    if (loginAs === 'VENDOR') return 'warning';
+    return 'primary';
   };
 
   const getLoginIcon = () => {
-    return loginAs === 'ADMIN' ? (
-      <SupervisorAccountIcon />
-    ) : (
-      <PersonIcon />
-    );
+    if (loginAs === 'ADMIN') return <SupervisorAccountIcon />;
+    if (loginAs === 'VENDOR') return <BusinessIcon />;
+    return <PersonIcon />;
   };
 
   const getHeaderText = () => {
-    return loginAs === 'ADMIN' ? 'LAW-MIS Admin Portal' : 'LAW-MIS User Portal';
+    if (loginAs === 'ADMIN') return 'LAW-MIS Admin Portal';
+    if (loginAs === 'VENDOR') return 'LAW-MIS Vendor Portal';
+    return 'LAW-MIS User Portal';
   };
 
   return (
@@ -157,7 +168,7 @@ const LawMisLogin: React.FC<LawMisLoginProps> = ({
           </Avatar>
 
           <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-            {loginAs === 'ADMIN' ? 'Admin Sign in' : 'User Sign in'}
+            {loginAs === 'ADMIN' ? 'Admin Sign in' : loginAs === 'VENDOR' ? 'Vendor Sign in' : 'User Sign in'}
           </Typography>
 
           {/* Login Type Selector */}
@@ -172,6 +183,7 @@ const LawMisLogin: React.FC<LawMisLoginProps> = ({
             >
               <MenuItem value="USER">Workshop User</MenuItem>
               <MenuItem value="ADMIN">Administrator</MenuItem>
+              <MenuItem value="VENDOR">Vendor</MenuItem>
             </Select>
           </FormControl>
 
@@ -182,7 +194,7 @@ const LawMisLogin: React.FC<LawMisLoginProps> = ({
               required
               fullWidth
               id="username"
-              label={loginAs === 'ADMIN' ? "Admin Username" : "Username"}
+              label={loginAs === 'ADMIN' ? "Admin Username" : loginAs === 'VENDOR' ? "Vendor Username" : "Username"}
               name="username"
               autoComplete="username"
               autoFocus

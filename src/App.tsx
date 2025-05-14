@@ -45,6 +45,7 @@ import LawMisUserRegister from './components/Register/LawMisUserRegister'
 import LawMisDashboard from './components/Dashboard/LawMisDashboard'
 import LAW_MISUserProfile from './components/Profile/LAW-MISUserProfile'
 import LAW_MISChangePassword from './components/Profile/LAW-MISChangePassword'
+import LawMisVendorDashboard from './components/Dashboard/LawMisVendorDashboard'
 
 // Calculate the width for the main content area based on drawer state
 const getContentWidth = (open: boolean, drawerWidth: number) => {
@@ -66,9 +67,10 @@ const getContentWidth = (open: boolean, drawerWidth: number) => {
 
 // Define Role and Dashboard Types
 type SelectedRole = 'VICS_ADMIN' | 'LAW_MIS' | null;
-type LawMisDashboardType = 'USER' | 'ADMIN' | null;
+type LawMisDashboardType = 'USER' | 'ADMIN' | 'VENDOR' | null;
 type LawMisUserView = 'LOGIN' | 'REGISTER';
 type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP' | 'ADD_SUPPLIER';
+type CurrentVendorView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'BECOME_VENDOR' | 'MANAGE_PRODUCTS' | 'VIEW_ORDERS';
 
 function App() {
   const drawerWidth = 200;
@@ -83,6 +85,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [lawMisLoggedInAs, setLawMisLoggedInAs] = useState<LawMisDashboardType>(null);
   const [currentLawMisView, setCurrentLawMisView] = useState<CurrentLawMisView>('DASHBOARD');
+  const [currentVendorView, setCurrentVendorView] = useState<CurrentVendorView>('DASHBOARD');
 
   // Create theme based on current mode
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
@@ -160,6 +163,31 @@ function App() {
 
   const navigateToAddWorkshop = () => {
       setCurrentLawMisView('ADD_WORKSHOP');
+  };
+
+  // --- New handlers for navigating within LAW-MIS logged-in vendor section ---
+  const navigateToVendorProfile = () => {
+    setCurrentVendorView('PROFILE');
+  };
+
+  const navigateToVendorChangePassword = () => {
+    setCurrentVendorView('CHANGE_PASSWORD');
+  };
+
+  const navigateToVendorDashboard = () => {
+    setCurrentVendorView('DASHBOARD');
+  };
+
+  const navigateToBecomeVendor = () => {
+    setCurrentVendorView('BECOME_VENDOR');
+  };
+
+  const navigateToManageProducts = () => {
+    setCurrentVendorView('MANAGE_PRODUCTS');
+  };
+
+  const navigateToViewOrders = () => {
+    setCurrentVendorView('VIEW_ORDERS');
   };
 
   // --- VICS App Content Rendering --- (Keep this separate for clarity)
@@ -294,7 +322,7 @@ function App() {
             onGoBack={handleGoBackToRoleSelection}
                       onRegisterClick={handleRegisterClick}
             dashboardType={lawMisDashboardType}
-            setLoginType={(type) => setLawMisDashboardType(type)}
+            setLoginType={(type: 'USER' | 'ADMIN' | 'VENDOR') => setLawMisDashboardType(type)}
                    />;
         } else {
                    return <LawMisUserRegister 
@@ -317,7 +345,7 @@ function App() {
                     onNavigateToAddWorkshop={navigateToAddWorkshop}
             />
           );
-        } else {
+        } else if (lawMisLoggedInAs === 'ADMIN') {
           // Show LAW-MIS Admin Dashboard (not implemented yet)
           return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
@@ -325,6 +353,20 @@ function App() {
               <Typography variant="body1" gutterBottom>This dashboard is currently under development.</Typography>
               <Button variant="contained" color="primary" onClick={handleGoBackToRoleSelection}>Logout</Button>
             </Box>
+          );
+        } else if (lawMisLoggedInAs === 'VENDOR') {
+          // Show LAW-MIS Vendor Dashboard
+          return (
+            <LawMisVendorDashboard
+              onLogout={handleGoBackToRoleSelection}
+              currentView={currentVendorView}
+              onNavigateBack={navigateToVendorDashboard}
+              onNavigateToChangePassword={navigateToVendorChangePassword}
+              onNavigateToUserProfile={navigateToVendorProfile}
+              onNavigateToBecomeVendor={navigateToBecomeVendor}
+              onNavigateToManageProducts={navigateToManageProducts}
+              onNavigateToViewOrders={navigateToViewOrders}
+            />
           );
         }
        }
