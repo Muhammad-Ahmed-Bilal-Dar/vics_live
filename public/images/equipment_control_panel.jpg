@@ -1,1 +1,6 @@
- 
+/* This is a placeholder text file representing the image file.
+   In a real application, this would be an actual jpg file.
+   The user would need to manually copy the image they want to this location. */
+
+// This is a binary file, please check if the image has been saved properly.
+// If not, you may need to manually download the image and save it to the public/images directory. 

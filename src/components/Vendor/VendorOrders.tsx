@@ -68,7 +68,12 @@ interface QuotationRequest {
   dateRequested: string;
   expiryDate: string;
   message: string;
-  items: OrderItem[];
+  items: {
+    id: string;
+    name: string;
+    quantity: number;
+    specifications?: string;
+  }[];
 }
 
 interface VendorOrdersProps {
@@ -281,13 +286,15 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ onNavigateBack }) => {
   };
 
   // Get color for status chip
-  const getStatusColor = (status: Order['status']) => {
+  const getStatusColor = (status: Order['status'] | QuotationRequest['status']) => {
     switch (status) {
       case 'pending': return 'warning';
       case 'processing': return 'info';
       case 'shipped': return 'primary';
       case 'delivered': return 'success';
       case 'cancelled': return 'error';
+      case 'responded': return 'success';
+      case 'expired': return 'error';
       default: return 'default';
     }
   };
@@ -762,8 +769,8 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ onNavigateBack }) => {
                           <TableRow key={item.id}>
                             <TableCell>{item.id}</TableCell>
                             <TableCell>{item.name}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell>{item.specifications || 'N/A'}</TableCell>
+                            <TableCell align="center">{item.quantity}</TableCell>
+                            <TableCell>N/A</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -856,7 +863,7 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ onNavigateBack }) => {
                   <Table size="small">
                     <TableHead sx={{ bgcolor: 'background.default' }}>
                       <TableRow>
-                        <TableCell>Item Name</TableCell>
+                        <TableCell>Item ID</TableCell>
                         <TableCell align="center">Quantity</TableCell>
                         <TableCell>Specifications</TableCell>
                       </TableRow>
@@ -864,7 +871,7 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ onNavigateBack }) => {
                     <TableBody>
                       {selectedQuotation.items.map((item) => (
                         <TableRow key={item.id}>
-                          <TableCell>{item.name}</TableCell>
+                          <TableCell>{item.id}</TableCell>
                           <TableCell align="center">{item.quantity}</TableCell>
                           <TableCell>{item.specifications || 'N/A'}</TableCell>
                         </TableRow>

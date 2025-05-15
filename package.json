@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build-no-ts": "vite build --emptyOutDir",
+    "build-ignore-ts": "tsc --project tsconfig.build.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

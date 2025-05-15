@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, Suspense } from 'react'
 import { 
   Box, 
   CssBaseline, 
@@ -12,21 +12,18 @@ import {
   Link,
   createTheme,
   PaletteMode,
-  Button
+  Button,
+  CircularProgress
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import SearchIcon from '@mui/icons-material/Search'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
-import Dashboard from './components/Dashboard'
-import StationModules from './components/StationModules'
-import Appointments from './components/Appointments'
-import UserManagement from './components/Management/UserManagement'
-import StationManagement from './components/Management/StationManagement'
-import AreaManagement from './components/Management/AreaManagement'
-import Settings from './components/Settings'
 import { getDesignTokens } from './theme'
 import './App.css'
+
+// Import lazyLoad utility
+import { lazyLoadComponent } from './utils/lazyLoad.jsx'
 
 // Shared dashboard components
 import { 
@@ -37,15 +34,24 @@ import {
   vicsFooterLogos 
 } from './components/Shared'
 
+// Lazy load components for code splitting
+const Dashboard = lazyLoadComponent(() => import('./components/Dashboard'))
+const StationModules = lazyLoadComponent(() => import('./components/StationModules'))
+const Appointments = lazyLoadComponent(() => import('./components/Appointments'))
+const UserManagement = lazyLoadComponent(() => import('./components/Management/UserManagement'))
+const StationManagement = lazyLoadComponent(() => import('./components/Management/StationManagement'))
+const AreaManagement = lazyLoadComponent(() => import('./components/Management/AreaManagement'))
+const Settings = lazyLoadComponent(() => import('./components/Settings'))
+
 // Authentication and role selection components
-import Login from './components/Login/Login'
-import RoleSelection from './components/RoleSelection/RoleSelection'
-import LawMisLogin from './components/Login/LawMisLogin'
-import LawMisUserRegister from './components/Register/LawMisUserRegister'
-import LawMisDashboard from './components/Dashboard/LawMisDashboard'
-import LAW_MISUserProfile from './components/Profile/LAW-MISUserProfile'
-import LAW_MISChangePassword from './components/Profile/LAW-MISChangePassword'
-import LawMisVendorDashboard from './components/Dashboard/LawMisVendorDashboard'
+const Login = lazyLoadComponent(() => import('./components/Login/Login'))
+const RoleSelection = lazyLoadComponent(() => import('./components/RoleSelection/RoleSelection'))
+const LawMisLogin = lazyLoadComponent(() => import('./components/Login/LawMisLogin'))
+const LawMisUserRegister = lazyLoadComponent(() => import('./components/Register/LawMisUserRegister'))
+const LawMisDashboard = lazyLoadComponent(() => import('./components/Dashboard/LawMisDashboard'))
+const LAW_MISUserProfile = lazyLoadComponent(() => import('./components/Profile/LAW-MISUserProfile'))
+const LAW_MISChangePassword = lazyLoadComponent(() => import('./components/Profile/LAW-MISChangePassword'))
+const LawMisVendorDashboard = lazyLoadComponent(() => import('./components/Dashboard/LawMisVendorDashboard'))
 
 // Calculate the width for the main content area based on drawer state
 const getContentWidth = (open: boolean, drawerWidth: number) => {
@@ -71,6 +77,13 @@ type LawMisDashboardType = 'USER' | 'ADMIN' | 'VENDOR' | null;
 type LawMisUserView = 'LOGIN' | 'REGISTER';
 type CurrentLawMisView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'ADD_WORKSHOP' | 'ADD_SUPPLIER';
 type CurrentVendorView = 'DASHBOARD' | 'PROFILE' | 'CHANGE_PASSWORD' | 'BECOME_VENDOR' | 'MANAGE_PRODUCTS' | 'VIEW_ORDERS';
+
+// Loading fallback
+const LoadingFallback = () => (
+  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <CircularProgress />
+  </Box>
+);
 
 function App() {
   const drawerWidth = 200;
@@ -190,7 +203,7 @@ function App() {
     setCurrentVendorView('VIEW_ORDERS');
   };
 
-  // --- VICS App Content Rendering --- (Keep this separate for clarity)
+  // --- VICS App Content Rendering ---
   const renderVicsAppContent = () => {
     if (currentModule === 'Dashboard') {
       return <Dashboard visible={true} />;
@@ -312,7 +325,7 @@ function App() {
       }
     }
 
-    // 3. LAW-MIS Selected? Show login screen directly
+    // 3. LAW-MIS Selected?
     if (selectedRole === 'LAW_MIS') {
       // If not logged in yet
        if (!lawMisLoggedInAs) { 
@@ -372,31 +385,15 @@ function App() {
        }
     }
 
-    // Fallback
-    return <Typography>Unknown state. Please refresh the page.</Typography>;
+    return null;
   };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box
-        sx={{
-          width: '100%',
-          height: '100vh',
-          overflow: 'auto',
-          animation: 'appFadeIn 0.5s ease-in-out',
-          '@keyframes appFadeIn': {
-            '0%': {
-              opacity: 0,
-            },
-            '100%': {
-              opacity: 1,
-            },
-          },
-        }}
-      >
-      {renderContent()} 
-      </Box>
+      <Suspense fallback={<LoadingFallback />}>
+        {renderContent()}
+      </Suspense>
     </ThemeProvider>
   );
 }
